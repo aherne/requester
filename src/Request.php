@@ -40,11 +40,11 @@ class Request
         CURLOPT_SSLCERTPASSWD=>"setSSL",
         CURLOPT_SSLKEY=>"setSSL",
         CURLOPT_SSLKEYPASSWD=>"setSSL",
-        CURLOPT_FOLLOWLOCATION=>"send",
-        CURLOPT_HEADERFUNCTION=>"send",
-        CURLOPT_MAXREDIRS=>"send",
-        CURLOPT_RETURNTRANSFER=>"send",
-        CURLOPT_CONNECTTIMEOUT_MS=>"send"
+        CURLOPT_FOLLOWLOCATION=>"prepare",
+        CURLOPT_HEADERFUNCTION=>"execute",
+        CURLOPT_MAXREDIRS=>"prepare",
+        CURLOPT_RETURNTRANSFER=>"prepare",
+        CURLOPT_CONNECTTIMEOUT_MS=>"prepare"
     ];
     
     protected $url;
@@ -194,8 +194,9 @@ class Request
         return new Request(\curl_copy_handle($this->connection));
     }
     
+    
     /**
-     * Gets cURL handle for SharedRequest and MultiRequest only. Developers MUST NOT use this method!
+     * (ONLY FOR INTERNAL USE) Gets cURL handle for SharedRequest and MultiRequest only. Only for internal usage!
      * 
      * @return resource
      */
@@ -205,11 +206,11 @@ class Request
     }
         
     /**
-     * Validates if request information is (correct) enough to produce a response
+     * (ONLY FOR INTERNAL USE) Validates request and prepares it for being sent. Only for internal usage!
      * 
      * @throws RequestException If request information is insufficient/invalid.
      */
-    protected function validate(): void
+    public function prepare(bool $returnTransfer = true, int $maxRedirectionsAllowed = 0, int $timeout = 300000): void
     {
         // validate url
         if (!$this->url) {
@@ -218,83 +219,67 @@ class Request
         
         // validate POST parameters
         if ($this->method == Method::POST && !$this->isPOST) {
-            throw new RequestException("No parameters or raw body to POST!");
+            throw new RequestException("No parameters to POST!");
         }        
         if ($this->method != Method::POST && $this->isPOST) {
-            throw new RequestException("Parameters can't be used unless method is POST");
+            throw new RequestException("Parameters can't be used unless request method is POST");
         }
         
-        // validate SSL
+        // validate SSL and sets certificate if missing
         if (strpos($this->url, "https")!==0 && $this->isSSL) {
             throw new RequestException("URL requested doesn't require SSL!");
         }
-    }
-    
-    /**
-     * Sets handler that will be used in parsing response headers.
-     * 
-     * @param array $headers
-     */
-    protected function setHeadersHandler(array &$headers): void
-    {
-        \curl_setopt($this->connection, CURLOPT_HEADERFUNCTION,
-            function($curl, $header) use (&$headers)
-            {
-                $len = strlen($header);
-                $header = explode(':', $header, 2);
-                // ignore invalid headers
-                if (count($header) < 2) {
-                    return $len;
-                } else {
-                    $headers[strtolower(trim($header[0]))][] = trim($header[1]);
-                    return $len;
-                }
-            }
-        );
-    }
-    
-    /**
-     * Sends request to produce a response. If resource is requested via HTTPS and no certificate was set, uses 'cacert.pem' from parent folder 
-     * (source: https://curl.haxx.se/ca/cacert.pem)
-     * 
-     * @param int $maxRedirectionsAllowed Number of max redirections allowed. Special values: -1 (infinite), 0 (none)
-     * @param int $timeout Connection timeout in milliseconds
-     * @return Response
-     */
-    public function send(int $maxRedirectionsAllowed = -1, int $timeout = 300000): Response
-    {
-        // validates selection
-        $this->validate();
-        
-        // use default certificate if none given
         if (strpos($this->url, "https")===0 && !$this->isSSL) {
             $this->setSSL(dirname(__DIR__).DIRECTORY_SEPARATOR."cacert.pem");
         }
         
-        // sets redirection rules
-        \curl_setopt($this->connection, CURLOPT_FOLLOWLOCATION, $maxRedirectionsAllowed!=0);
-        \curl_setopt($this->connection, CURLOPT_MAXREDIRS, $maxRedirectionsAllowed);
+        // sets redirection policy
+        if($maxRedirectionsAllowed==0) {
+            \curl_setopt($this->connection, CURLOPT_FOLLOWLOCATION, false);
+        } else {
+            \curl_setopt($this->connection, CURLOPT_FOLLOWLOCATION, true);
+            \curl_setopt($this->connection, CURLOPT_MAXREDIRS, $maxRedirectionsAllowed);
+        }
         
-        // sets transfer to be always returned
-        \curl_setopt($this->connection, CURLOPT_RETURNTRANSFER, true);
+        // sets return transfer policy
+        \curl_setopt($this->connection, CURLOPT_RETURNTRANSFER, $returnTransfer);
         
         // sets connection timeout
         \curl_setopt($this->connection, CURLOPT_CONNECTTIMEOUT_MS, $timeout);
-                
-        return $this->execute();
     }
     
     /**
-     * Executes request to produce a response
+     * Validates request then executes it in order to produce a response
      * 
+     * @param int $returnTransfer Whether or not response body should be returned
+     * @param int $maxRedirectionsAllowed Maximum number of redirections allowed (if zero, it means none are)
+     * @param int $timeout Connection timeout in milliseconds
      * @throws ResponseException If execution failed
      * @return Response
      */
-    protected function execute(): Response
-    {        
+    public function execute(bool $returnTransfer = true, int $maxRedirectionsAllowed = 0, int $timeout = 300000): Response
+    {
+        // validates request and prepares it for being sent
+        $this->prepare($returnTransfer, $maxRedirectionsAllowed, $timeout);
+        
         // registers response header processing
         $headers = [];
-        $this->setHeadersHandler($headers);
+        if ($returnTransfer) {
+            \curl_setopt($this->connection, CURLOPT_HEADERFUNCTION,
+                function($curl, $header) use (&$headers)
+                {
+                    $len = strlen($header);
+                    $header = explode(':', $header, 2);
+                    // ignore invalid headers
+                    if (count($header) < 2) {
+                        return $len;
+                    } else {
+                        $headers[strtolower(trim($header[0]))][] = trim($header[1]);
+                        return $len;
+                    }
+                }
+            );
+        }
         
         // executes request
         $startTime = microtime(true);

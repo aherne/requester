@@ -6,6 +6,7 @@ namespace Lucinda\URL\Response;
  */
 class Information
 {
+    private $url;
     private $info = [];
     private $cookies = [];
     private $duration;
@@ -19,26 +20,26 @@ class Information
      */
     public function __construct($curl, float $duration)
     {
-        // TODO: see the format
-        $this->cookies = \curl_getinfo($curl, CURLINFO_COOKIELIST);
-        $this->duration = $duration;
-        $this->responseCode = \curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
-        $this->info = \curl_getinfo($curl);
+        $this->setCookies($curl);
+        $this->setDuration($curl, $duration);
+        $this->setStatusCode($curl);
+        $this->setURL($curl);
+        $this->setAll($curl);
     }
     
     /**
-     * Gets total duration in milliseconds by whom response was received
-     * 
-     * @return float
+     * Sets list of cookies received from response
+     *
+     * @param resource $curl
      */
-    public function getDuration(): float
+    private function setCookies($curl): void
     {
-        return $this->duration;
+        $this->cookies = \curl_getinfo($curl, CURLINFO_COOKIELIST);
     }
     
     /**
      * Gets list of cookies received from response
-     * 
+     *
      * @return array
      */
     public function getCookies(): array
@@ -47,13 +48,80 @@ class Information
     }
     
     /**
-     * Gets response HTTP status code
+     * Sets total response duration in milliseconds
      * 
+     * @param resource $curl
+     * @param float $duration Total duration calculated by PHP
+     */
+    private function setDuration($curl, float $duration): void
+    {
+        if ($duration===0) {
+            $this->duration = round($duration*1000);
+        } else if (defined("CURLINFO_TOTAL_TIME_T")) {
+            $this->duration = \curl_getinfo($curl, CURLINFO_TOTAL_TIME_T);
+        } else {
+            $this->duration = \curl_getinfo($curl, CURLINFO_TOTAL_TIME)*1000;
+        }
+    }
+    
+    /**
+     * Gets total duration in milliseconds by whom response was received
+     *
+     * @return int
+     */
+    public function getDuration(): int
+    {
+        return $this->duration;
+    }
+    
+    /**
+     * Sets response HTTP status code
+     * 
+     * @param resource $curl
+     */
+    private function setStatusCode($curl): void
+    {
+        $this->responseCode = \curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
+    }
+    
+    /**
+     * Gets response HTTP status code
+     *
      * @return int
      */
     public function getStatusCode(): int
     {
         return $this->responseCode;
+    }
+    
+    /**
+     * Sets URL requested
+     * 
+     * @param resource $curl
+     */
+    private function setURL($curl): void
+    {
+        $this->url = \curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
+    }
+    
+    /**
+     * Gets url requested
+     *
+     * @return string
+     */
+    public function getURL(): string
+    {
+        return $this->url;
+    }
+    
+    /**
+     * Sets all info collected by cURL driver
+     * 
+     * @param resource $curl
+     */
+    private function setAll($curl): void
+    {
+        $this->info = \curl_getinfo($curl);
     }
     
     /**

@@ -13,11 +13,9 @@ class FileDownload extends Request
     private const ADDITIONAL_COVERED_OPTIONS = [
         CURLOPT_FILE=>"setFile",
         CURLOPT_POSTFIELDS=>"setRaw",
-        CURLOPT_BUFFERSIZE=>"download",
-        CURLOPT_NOPROGRESS=>"download",
-        CURLOPT_PROGRESSFUNCTION=>"download",
-        CURLOPT_RETURNTRANSFER=>"download",
-        CURLOPT_CONNECTTIMEOUT_MS=>"download"
+        CURLOPT_BUFFERSIZE=>"setProgressHandler",
+        CURLOPT_NOPROGRESS=>"setProgressHandler",
+        CURLOPT_PROGRESSFUNCTION=>"setProgressHandler"
     ];
     private $fileHandle;
     
@@ -72,33 +70,11 @@ class FileDownload extends Request
     }
     
     /**
-     * {@inheritDoc}
-     * @see \Lucinda\URL\Request::validate()
-     */
-    protected function validate(): void
-    {
-        // validate url
-        if (!$this->url) {
-            throw new RequestException("Setting a URL is mandatory!");
-        }
-        
-        // validate PUT transfer
-        if (!$this->fileHandle) {
-            throw new RequestException("Download requests require usage of setFile method");
-        }
-        
-        // validate SSL
-        if (strpos($this->url, "https")!==0 && $this->isSSL) {
-            throw new RequestException("URL requested doesn't require SSL!");
-        }
-    }
-    
-    /**
      * Sets handler that will be used in tracking download progress
-     * 
+     *
      * @param Progress $progressHandler
      */
-    private function setProgressHandler(Progress $progressHandler): void
+    public function setProgressHandler(Progress $progressHandler): void
     {
         \curl_setopt($this->connection, CURLOPT_BUFFERSIZE, $progressHandler->getBufferSize());
         \curl_setopt($this->connection, CURLOPT_NOPROGRESS, false);
@@ -111,29 +87,16 @@ class FileDownload extends Request
     }
     
     /**
-     * Executes request and downloads file 
-     * 
-     * @param Progress $progressHandler Handler to use in tracking download progress.
-     * @param int $timeout Connection timeout in milliseconds
-     * @return Response
+     * {@inheritDoc}
+     * @see \Lucinda\URL\Request::prepare()
      */
-    public function download(Progress $progressHandler = null, int $timeout = 300000): Response
+    public function prepare(bool $returnTransfer = true, int $maxRedirectionsAllowed = 0, int $timeout = 300000): void
     {
-        $this->validate();
+        parent::prepare($returnTransfer, $maxRedirectionsAllowed, $timeout);
         
-        // use default certificate if none given
-        if (strpos($this->url, "https")===0 && !$this->isSSL) {
-            $this->setSSL(dirname(__DIR__).DIRECTORY_SEPARATOR."cacert.pem");
+        // validate that handle was used
+        if (!$this->fileHandle) {
+            throw new RequestException("Download requests require usage of setFile method");
         }
-        
-        // delegates upload progress to handler
-        if($progressHandler !== null) {
-            $this->setProgressHandler($progressHandler);
-        }
-        
-        // sets connection timeout
-        \curl_setopt($this->connection, CURLOPT_CONNECTTIMEOUT_MS, $timeout);
-        
-        return $this->execute();
     }
 }

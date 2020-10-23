@@ -4,6 +4,7 @@ namespace Lucinda\URL;
 use Lucinda\URL\Request\Exception as RequestException;
 use Lucinda\URL\Request\Method;
 use Lucinda\URL\Response\Progress;
+use Lucinda\URL\Request\Parameters;
 
 /**
  * Encapsulates a file upload via a POST/PUT HTTP/HTTPS request
@@ -15,14 +16,11 @@ class FileUpload extends Request
         CURLOPT_INFILESIZE=>"setFile",
         CURLOPT_PUT=>"setMethod",
         CURLOPT_POSTFIELDS=>"setRaw",
-        CURLOPT_BUFFERSIZE=>"upload",
-        CURLOPT_NOPROGRESS=>"upload",
-        CURLOPT_PROGRESSFUNCTION=>"upload",
-        CURLOPT_RETURNTRANSFER=>"upload",
-        CURLOPT_CONNECTTIMEOUT_MS=>"upload"
+        CURLOPT_BUFFERSIZE=>"setProgressHandler",
+        CURLOPT_NOPROGRESS=>"setProgressHandler",
+        CURLOPT_PROGRESSFUNCTION=>"setProgressHandler"
     ];
     private $fileHandle;
-    private $isRawTransfer = false;
     
     /**
      * {@inheritDoc}
@@ -74,13 +72,22 @@ class FileUpload extends Request
     }
     
     /**
+     * {@inheritDoc}
+     * @see \Lucinda\URL\Request::setParameters()
+     */
+    public function setParameters(array $parameters = []): Parameters
+    {
+        throw new RequestException("Using POST parameters for file upload is not allowed: please use setRaw method instead!");
+    }
+    
+    /**
      * Sets raw (binary) content to be uploaded using POST
      * 
      * @param string $body
      */
     public function setRaw(string $body): void
     {
-        $this->isRawTransfer = true;
+        $this->isPOST = true;
         \curl_setopt($this->connection, CURLOPT_POSTFIELDS, $body);
     }
     
@@ -99,38 +106,11 @@ class FileUpload extends Request
     }
     
     /**
-     * {@inheritDoc}
-     * @see \Lucinda\URL\Request::validate()
-     */
-    protected function validate(): void
-    {
-        // validate url
-        if (!$this->url) {
-            throw new RequestException("Setting a URL is mandatory!");
-        }
-        
-        // validate PUT transfer
-        if ($this->method == Method::PUT && !$this->fileHandle) {
-            throw new RequestException("PUT requests require usage of setFile method");
-        }
-        
-        // validate POST transfer
-        if ($this->method == Method::POST && !$this->isRawTransfer) {
-            throw new RequestException("No parameters or raw body to POST!");
-        }
-        
-        // validate SSL
-        if (strpos($this->url, "https")!==0 && $this->isSSL) {
-            throw new RequestException("URL requested doesn't require SSL!");
-        }
-    }
-    
-    /**
      * Sets handler that will be used in tracking upload progress
      *
      * @param Progress $progressHandler
      */
-    private function setProgressHandler(Progress $progressHandler): void
+    public function setProgressHandler(Progress $progressHandler): void
     {
         \curl_setopt($this->connection, CURLOPT_BUFFERSIZE, $progressHandler->getBufferSize());
         \curl_setopt($this->connection, CURLOPT_NOPROGRESS, false);
@@ -143,35 +123,22 @@ class FileUpload extends Request
     }    
     
     /**
-     * Executes request and uploads file
-     *
-     * @param Progress $progressHandler Handler to use in tracking upload progress.
-     * @param int $timeout Connection timeout in milliseconds
-     * @return Response
+     * {@inheritDoc}
+     * @see \Lucinda\URL\Request::prepare()
      */
-    public function upload(Progress $progressHandler = null, int $timeout = 300000): Response
+    public function prepare(bool $returnTransfer = true, int $maxRedirectionsAllowed = 0, int $timeout = 300000): void
     {
-        $this->validate();
+        parent::prepare($returnTransfer, $maxRedirectionsAllowed, $timeout);
         
-        // use default certificate if none given
-        if (strpos($this->url, "https")===0 && !$this->isSSL) {
-            $this->setSSL(dirname(__DIR__).DIRECTORY_SEPARATOR."cacert.pem");
+        // validate PUT transfer
+        if ($this->method == Method::PUT && !$this->fileHandle) {
+            throw new RequestException("PUT requests require usage of setFile method");
+        }
+        if ($this->method != Method::PUT && $this->fileHandle) {
+            throw new RequestException("File handle requires PUT request method");
         }
         
-        // delegates upload progress to handler
-        if($progressHandler !== null) {
-            $this->setProgressHandler($progressHandler);
-        }
-        
-        // signals an upload is pending
+        // signals that an upload is pending
         \curl_setopt($this->connection, CURLOPT_UPLOAD, true);
-        
-        // sets transfer to be always returned
-        \curl_setopt($this->connection, CURLOPT_RETURNTRANSFER, true);
-        
-        // sets connection timeout
-        \curl_setopt($this->connection, CURLOPT_CONNECTTIMEOUT_MS, $timeout);
-                
-        return $this->execute();
     }
 }
