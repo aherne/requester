@@ -8,7 +8,6 @@ use Lucinda\URL\Request\Cookies;
 use Lucinda\URL\Request\SSL;
 use Lucinda\URL\Request\Method;
 use Lucinda\URL\Request\Parameters;
-use Lucinda\URL\Response\Information;
 
 /**
  * Encapsulates a GET HTTP/HTTPS request for any resource
@@ -290,7 +289,7 @@ class Request
         }
         
         // split headers from body
-        return new Response(new Information($this->connection, ($endTime-$startTime)), $body, $headers);
+        return new Response($this->connection, $body, $headers, ($endTime-$startTime));
     }
 }
 

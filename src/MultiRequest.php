@@ -3,7 +3,6 @@ namespace Lucinda\URL;
 
 use Lucinda\URL\Request\Exception as RequestException;
 use Lucinda\URL\Response\Exception as ResponseException;
-use Lucinda\URL\Response\Information;
 use Lucinda\URL\Request\Pipelining;
 
 /**
@@ -117,15 +116,15 @@ class MultiRequest
         $responses = [];
         $i = 0;
         while ($info = curl_multi_info_read($this->connection)) {
-            if ($info["result"]!=CURLE_OK) {
+            if ($info["result"]!==CURLE_OK) {
                 throw new ResponseException(curl_multi_strerror($this->connection), curl_multi_errno($this->connection));
             }
             $key = (int) $info['handle'];
             $driver = $this->children[$key]->getDriver();
             if ($returnTransfer) {
-                $responses[$key] = new Response(new Information($driver, 0), curl_multi_getcontent($driver), $headers[$key]);
+                $responses[$key] = new Response($driver, curl_multi_getcontent($driver), $headers[$key]);
             } else {
-                $responses[$key] = new Response(new Information($driver, 0), "", []);
+                $responses[$key] = new Response($driver, "", []);
             }
             $i++;
         }
