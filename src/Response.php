@@ -84,7 +84,7 @@ class Response
         if ($duration===0) {
             $this->duration = round($duration*1000);
         } else if (defined("CURLINFO_TOTAL_TIME_T")) {
-            $this->duration = \curl_getinfo($curl, CURLINFO_TOTAL_TIME_T);
+            $this->duration = round(\curl_getinfo($curl, CURLINFO_TOTAL_TIME_T)/1000);
         } else {
             $this->duration = \curl_getinfo($curl, CURLINFO_TOTAL_TIME)*1000;
         }

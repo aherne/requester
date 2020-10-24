@@ -1,0 +1,22 @@
+{
+    "name": "lucinda/requester",
+    "type": "library",
+    "description": "Light weight complete object oriented cURL wrapper for HTTP/HTTPS requests",
+    "keywords": ["curl","http", "https","wrapper"],
+    "license": "MIT",
+    "require": {
+        "php": "^7.1"
+    },
+    "autoload": {
+    	"psr-4": {
+        	"Lucinda\\URL\\": "src/"
+    	}
+    },
+    "authors": [
+        {
+            "name": "Lucian Popescu",
+            "email": "lucian.gabriel.popescu@gmail.com",
+            "role": "Developer"
+        }
+    ]
+}
