@@ -1,5 +1,5 @@
 <?php
-namespace Lucinda\URL\Cookie;
+namespace Lucinda\URL;
 
 /**
  * Encapsulates a HTTP cookie
@@ -8,9 +8,10 @@ class Cookie
 {
     private $name;
     private $value;
-    private $maxAge;
-    private $path;
+    private $maxAge = 0;
+    private $path = "/";
     private $domain;
+    private $includeSubdomains = false;
     private $isSecuredByHTTPS = false;
     private $isSecuredByHTTPheaders = false;
     
@@ -40,10 +41,12 @@ class Cookie
      * Sets (sub)domain that the cookie is available to.
      *
      * @param string $domain
+     * @param bool $includeSubdomains
      */
-    public function setDomain(string $domain): void
+    public function setDomain(string $domain, bool $includeSubdomains = false): void
     {
         $this->domain = $domain;
+        $this->includeSubdomains = $includeSubdomains;
     }
     
     /**
@@ -73,28 +76,46 @@ class Cookie
     }
     
     /**
-     * Converts cookie to string ready to be value of Set-Cookie header
+     * Converts cookie to string ready to be placed as new line in COOKIEJAR file
      * 
      * @return string
      */
     public function toString(): string
     {
-        $output = "";
+        $options = [];
+        $options[] = ($this->domain?$this->domain:"localhost").($this->isSecuredByHTTPheaders?"#HttpOnly_":"");
+        $options[] = $this->includeSubdomains?"TRUE":"FALSE";
+        $options[] = $this->path?$this->path:"/";
+        $options[] = $this->isSecuredByHTTPS?"true":"false";
+        $options[] = $this->maxAge?$this->maxAge:0;
+        $options[] = $this->name;
+        $options[] = $this->value;
+        return implode("\t", $options);
+    }
+    
+    /**
+     * Converts cookie to string ready to be value of Set-Cookie header
+     *
+     * @return string
+     */
+    public function toHeader(): string
+    {
+        $options = "";
         if ($this->domain) {
-            $output.="Domain: ".$this->domain."; ";
+            $options.="Domain=".$this->domain."; ";
         }
         if ($this->path) {
-            $output.="Path: ".$this->path."; ";
+            $options.="Path=".$this->path."; ";
         }
         if ($this->maxAge) {
-            $output.="Max-Age: ".$this->maxAge."; ";
+            $options.="Max-Age=".$this->maxAge."; ";
         }
         if ($this->isSecuredByHTTPS) {
-            $output.="Secure: 1; ";
+            $options.="Secure; ";
         }
         if ($this->isSecuredByHTTPheaders) {
-            $output.="HttpOnly: 1; ";
+            $options.="HttpOnly; ";
         }
-        return $this->name."=".$this->value.($output?"; ".substr($output, 0, -2):"");
+        return $this->name."=".$this->value.($options?"; ".substr($options, 0, -2):"");
     }
 }

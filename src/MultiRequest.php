@@ -4,6 +4,7 @@ namespace Lucinda\URL;
 use Lucinda\URL\Request\Exception as RequestException;
 use Lucinda\URL\Response\Exception as ResponseException;
 use Lucinda\URL\Request\Pipelining;
+use Lucinda\URL\Connection\Multi;
 
 /**
  * Encapsulates a multi request, able to handle asynchronously multiple Request instances
@@ -24,21 +25,10 @@ class MultiRequest
      */
     public function __construct(int $pipeliningOption = Pipelining::HTTP1_HTTP2)
     {
-        $this->connection = \curl_multi_init();
-        \curl_multi_setopt($this->connection, CURLMOPT_PIPELINING, $pipeliningOption);
+        $this->connection = new Multi();
+        $this->connection->set(CURLMOPT_PIPELINING, $pipeliningOption);
     }
-    
-    /**
-     * Closes all open handles automatically
-     */
-    public function __destruct()
-    {
-        foreach($this->children as $child) {
-            \curl_multi_remove_handle($this->connection, $child->getDriver());
-        }
-        \curl_multi_close($this->connection);
-    }
-    
+        
     /**
      * Adds request to be executed asynchronously
      * 
@@ -46,16 +36,15 @@ class MultiRequest
      */
     public function add(Request $request): void
     {
-        $driver = $request->getDriver();
-        \curl_multi_add_handle($this->connection, $driver);
-        $this->children[(int) $driver] = $request;
-        return $request;
+        $connection = $request->getConnection();
+        $this->connection->add($connection);
+        $this->children[(int) $connection->getDriver()] = $request;
     }
     
     /**
      * Sets obscure cURLm option not already covered by API.
      *
-     * @param int $curlopt Curlmopt option key (eg: CURLMOPT_MAX_PIPELINE_LENGTH)
+     * @param int $curlMultiOpt Curlmopt option key (eg: CURLMOPT_MAX_PIPELINE_LENGTH)
      * @param mixed $value
      * @throws RequestException If HTTP method is invalid
      */
@@ -64,7 +53,7 @@ class MultiRequest
         if ($curlMultiOpt==CURLMOPT_PIPELINING) {
             throw new RequestException("Option already covered by constructor!");
         }
-        \curl_multi_setopt($this->connection, $curlMultiOpt, $value);
+        $this->connection->set($curlMultiOpt, $value);
     }
     
     /**
@@ -83,51 +72,30 @@ class MultiRequest
         foreach($this->children as $key=>$request) {
             $request->prepare($returnTransfer, $maxRedirectionsAllowed, $timeout);
             if ($returnTransfer) {
-                \curl_setopt($request->getDriver(), CURLOPT_HEADERFUNCTION,
+                $request->getConnection()->set(CURLOPT_HEADERFUNCTION,
                     function($curl, $header) use (&$headers, $key)
                     {
-                        $len = strlen($header);
-                        $header = explode(':', $header, 2);
-                        // ignore invalid headers
-                        if (count($header) < 2) {
-                            return $len;
-                        } else {
-                            $headers[$key][strtolower(trim($header[0]))][] = trim($header[1]);
-                            return $len;
+                        $position = strpos($header, ":");
+                        if($position !== false) {
+                            $headers[$key][trim(substr($header, 0, $position))] = trim(substr($header, $position+1));
                         }
+                        return strlen($header);
                     }
                 );
             }
         }
                 
-        // executes multi handle
-        $active = null;
-        do {
-            $status = curl_multi_exec($this->connection, $active);
-            if ($status !== CURLM_OK) {
-                throw new ResponseException(curl_multi_strerror($this->connection), curl_multi_errno($this->connection));
-            }
-            if ($active) {
-                curl_multi_select($this->connection);
-            }
-        } while ($active);
-        
-        // get responses
-        $responses = [];
-        $i = 0;
-        while ($info = curl_multi_info_read($this->connection)) {
-            if ($info["result"]!==CURLE_OK) {
-                throw new ResponseException(curl_multi_strerror($this->connection), curl_multi_errno($this->connection));
-            }
-            $key = (int) $info['handle'];
-            $driver = $this->children[$key]->getDriver();
+        // executes multi-request and compiles responses
+        $bodies = $this->connection->execute($headers, $returnTransfer);
+        foreach($this->children as $key=>$request) {
+            $connection = $request->getConnection();
             if ($returnTransfer) {
-                $responses[$key] = new Response($driver, curl_multi_getcontent($driver), $headers[$key]);
+                $responses[$key] = new Response($connection, $bodies[$key], $headers[$key]);
             } else {
-                $responses[$key] = new Response($driver, "", []);
+                $responses[$key] = new Response($connection, "", []);
             }
-            $i++;
         }
+        
         return $responses;
     }
 }

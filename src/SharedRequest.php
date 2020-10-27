@@ -1,6 +1,7 @@
 <?php
 namespace Lucinda\URL;
 
+use Lucinda\URL\Connection\Shared as SharedConnection;
 use Lucinda\URL\Request\ShareType;
 
 /**
@@ -11,7 +12,6 @@ use Lucinda\URL\Request\ShareType;
 class SharedRequest
 {
     private $connection;
-    private $children = [];
     
     /**
      * Initiates a shared URL connection based on one of ShareType enum values
@@ -20,8 +20,8 @@ class SharedRequest
      */
     public function __construct(int $type = ShareType::COOKIES)
     {
-        $this->connection = \curl_share_init();
-        \curl_share_setopt( $this->connection, CURLSHOPT_SHARE, $type);
+        $this->connection = new SharedConnection();
+        $this->connection->set(CURLSHOPT_SHARE, $type);
     }
     
     /**
@@ -31,21 +31,7 @@ class SharedRequest
      */
     public function add(Request $request): void
     {
-        \curl_setopt($request->getDriver(), CURLOPT_SHARE, $this->connection);
-        $this->children[] = $request;
-        return $request;
-    }
-    
-    /**
-     * 
-     */
-    public function __destruct()
-    {
-        \curl_share_close($this->connection);
-        // force handles to be garbage collected here
-        foreach($this->children as $child) {
-            $child->__destruct(); // forces garbage collector to occur here
-        }
+        $this->connection->add($request->getConnection());
     }
 }
 

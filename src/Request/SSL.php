@@ -2,6 +2,7 @@
 namespace Lucinda\URL\Request;
 
 use Lucinda\URL\FileNotFoundException;
+use Lucinda\URL\Connection\Single as Connection;
 
 /**
  * Encapsulates SSL options to use in request
@@ -11,24 +12,23 @@ class SSL
     private $connection;
     
     /**
-     * Sets cURL handle to perform operations on as well as file holding public PEM certificate.
+     * Sets connection to perform operations on as well as file holding public PEM certificate.
      * 
-     * @param resource $curl
+     * @param Connection $connection
      * @param string $certificateAuthorityBundlePath
      * @throws FileNotFoundException.
      */
-    public function __construct($curl, string $certificateAuthorityBundlePath)
+    public function __construct(Connection $connection, string $certificateAuthorityBundlePath)
     {
-        $this->connection = $curl;
+        $this->connection = $connection;
         
         if (!file_exists($certificateAuthorityBundlePath)) {
             throw new FileNotFoundException($certificateAuthorityBundlePath);
         }
-        \curl_setopt($this->connection, CURLOPT_CAPATH, $certificateAuthorityBundlePath);
-        
-        
-        \curl_setopt($this->connection, CURLOPT_SSL_VERIFYPEER, true);
-        \curl_setopt($this->connection, CURLOPT_SSL_VERIFYHOST, 2);
+        $this->connection->set(CURLOPT_CAINFO, $certificateAuthorityBundlePath);
+                
+        $this->connection->set(CURLOPT_SSL_VERIFYPEER, true);
+        $this->connection->set(CURLOPT_SSL_VERIFYHOST, 2);
     }
     
     /**
@@ -43,9 +43,9 @@ class SSL
         if (!file_exists($path)) {
             throw new FileNotFoundException($path);
         }
-        \curl_setopt($this->connection, CURLOPT_SSLCERT, $path);
+        $this->connection->set(CURLOPT_SSLCERT, $path);
         if ($password) {
-            \curl_setopt($this->connection, CURLOPT_SSLCERTPASSWD, $password);
+            $this->connection->set(CURLOPT_SSLCERTPASSWD, $password);
         }
     }
     
@@ -61,9 +61,9 @@ class SSL
         if (!file_exists($path)) {
             throw new FileNotFoundException($path);
         }
-        \curl_setopt($this->connection, CURLOPT_SSLKEY, $path);
+        $this->connection->set(CURLOPT_SSLKEY, $path);
         if ($password) {
-            \curl_setopt($this->connection, CURLOPT_SSLKEYPASSWD, $password);
+            $this->connection->set(CURLOPT_SSLKEYPASSWD, $password);
         }
     }    
 }

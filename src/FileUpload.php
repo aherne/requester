@@ -28,7 +28,6 @@ class FileUpload extends Request
      */
     public function __destruct()
     {
-        parent::__destruct();
         if ($this->fileHandle) {
             fclose($this->fileHandle);
         }
@@ -43,10 +42,10 @@ class FileUpload extends Request
         switch($method)
         {
             case Method::POST:
-                \curl_setopt($this->connection, CURLOPT_POST, true);
+                $this->connection->set(CURLOPT_POST, true);
                 break;
             case Method::PUT:
-                \curl_setopt($this->connection, CURLOPT_PUT, true);
+                $this->connection->set(CURLOPT_PUT, true);
                 break;
             default:
                 throw new RequestException("Unsupported request method: ".$method);
@@ -67,8 +66,8 @@ class FileUpload extends Request
             throw new FileNotFoundException($path);
         }
         $this->fileHandle = fopen($path, "r");
-        \curl_setopt($this->connection, CURLOPT_INFILE, $this->fileHandle);
-        \curl_setopt($this->connection, CURLOPT_INFILESIZE, filesize($path));
+        $this->connection->set(CURLOPT_INFILE, $this->fileHandle);
+        $this->connection->set(CURLOPT_INFILESIZE, filesize($path));
     }
     
     /**
@@ -88,7 +87,7 @@ class FileUpload extends Request
     public function setRaw(string $body): void
     {
         $this->isPOST = true;
-        \curl_setopt($this->connection, CURLOPT_POSTFIELDS, $body);
+        $this->connection->set(CURLOPT_POSTFIELDS, $body);
     }
     
     /**
@@ -102,7 +101,7 @@ class FileUpload extends Request
         } else if (isset(self::COVERED_OPTIONS[$curlopt])) {
             throw new RequestException("Option already covered by ".self::COVERED_OPTIONS[$curlopt]." method!");
         }
-        \curl_setopt($this->connection, $curlopt, $value);
+        $this->connection->set($curlopt, $value);
     }
     
     /**
@@ -112,9 +111,9 @@ class FileUpload extends Request
      */
     public function setProgressHandler(Progress $progressHandler): void
     {
-        \curl_setopt($this->connection, CURLOPT_BUFFERSIZE, $progressHandler->getBufferSize());
-        \curl_setopt($this->connection, CURLOPT_NOPROGRESS, false);
-        \curl_setopt($this->connection, CURLOPT_PROGRESSFUNCTION,
+        $this->connection->set(CURLOPT_BUFFERSIZE, $progressHandler->getBufferSize());
+        $this->connection->set(CURLOPT_NOPROGRESS, false);
+        $this->connection->set(CURLOPT_PROGRESSFUNCTION,
             function($curl, int $downloadSize, int $downloaded, int $uploadSize, int $uploaded) use ($progressHandler)
             {
                 $progressHandler->handle($uploadSize, $uploaded);
@@ -139,6 +138,8 @@ class FileUpload extends Request
         }
         
         // signals that an upload is pending
-        \curl_setopt($this->connection, CURLOPT_UPLOAD, true);
+        if (!$this->isPOST) {
+            $this->connection->set(CURLOPT_UPLOAD, true);
+        }
     }
 }

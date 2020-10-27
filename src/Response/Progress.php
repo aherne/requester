@@ -19,6 +19,6 @@ interface Progress
      * @param int $totalSize
      * @param int $processedSize
      */
-    function handle(int $totalSize, int $processedSize);
+    function handle(int $totalSize, int $processedSize): void;
 }
 

@@ -12,25 +12,12 @@ class FileDownload extends Request
 {
     private const ADDITIONAL_COVERED_OPTIONS = [
         CURLOPT_FILE=>"setFile",
-        CURLOPT_POSTFIELDS=>"setRaw",
         CURLOPT_BUFFERSIZE=>"setProgressHandler",
         CURLOPT_NOPROGRESS=>"setProgressHandler",
         CURLOPT_PROGRESSFUNCTION=>"setProgressHandler"
     ];
     private $fileHandle;
-    
-    /**
-     * {@inheritDoc}
-     * @see \Lucinda\URL\Request::__destruct()
-     */
-    public function __destruct()
-    {
-        parent::__destruct();
-        if ($this->fileHandle) {
-            fclose($this->fileHandle);
-        }
-    }
-    
+        
     /**
      * {@inheritDoc}
      * @see \Lucinda\URL\Request::setMethod()
@@ -50,9 +37,8 @@ class FileDownload extends Request
      */
     public function setFile(string $path): void
     {
-        $this->fileHandle = fopen($path, "w");
-        \curl_setopt($this->connection, CURLOPT_RETURNTRANSFER, true);
-        \curl_setopt($this->connection, CURLOPT_FILE, $this->fileHandle);
+        $this->fileHandle = fopen($path, "w+");
+        $this->connection->set(CURLOPT_FILE, $this->fileHandle);
     }
     
     /**
@@ -66,7 +52,7 @@ class FileDownload extends Request
         } else if (isset(self::COVERED_OPTIONS[$curlopt])) {
             throw new RequestException("Option already covered by ".self::COVERED_OPTIONS[$curlopt]." method!");
         }
-        \curl_setopt($this->connection, $curlopt, $value);
+        $this->connection->set($curlopt, $value);
     }
     
     /**
@@ -76,13 +62,13 @@ class FileDownload extends Request
      */
     public function setProgressHandler(Progress $progressHandler): void
     {
-        \curl_setopt($this->connection, CURLOPT_BUFFERSIZE, $progressHandler->getBufferSize());
-        \curl_setopt($this->connection, CURLOPT_NOPROGRESS, false);
-        \curl_setopt($this->connection, CURLOPT_PROGRESSFUNCTION,
+        $this->connection->set(CURLOPT_BUFFERSIZE, $progressHandler->getBufferSize());
+        $this->connection->set(CURLOPT_NOPROGRESS, false);
+        $this->connection->set(CURLOPT_PROGRESSFUNCTION,
             function($curl, int $downloadSize, int $downloaded, int $uploadSize, int $uploaded) use ($progressHandler)
             {
                 $progressHandler->handle($downloadSize, $downloaded);
-        }
+            }
         );
     }
     
@@ -92,11 +78,34 @@ class FileDownload extends Request
      */
     public function prepare(bool $returnTransfer = true, int $maxRedirectionsAllowed = 0, int $timeout = 300000): void
     {
-        parent::prepare($returnTransfer, $maxRedirectionsAllowed, $timeout);
+        // validate url
+        if (!$this->url) {
+            throw new RequestException("Setting a URL is mandatory!");
+        }
         
         // validate that handle was used
         if (!$this->fileHandle) {
             throw new RequestException("Download requests require usage of setFile method");
         }
+        
+        // validate SSL and sets certificate if missing
+        if (strpos($this->url, "https")!==0 && $this->isSSL) {
+            throw new RequestException("URL requested doesn't require SSL!");
+        }
+        if (strpos($this->url, "https")===0 && !$this->isSSL) {
+            $this->setSSL(dirname(__DIR__).DIRECTORY_SEPARATOR."certificates".DIRECTORY_SEPARATOR."cacert.pem");
+        }
+        
+        // ignore non-applicable $returntransfer, $maxRedirectionsAllowed
+        
+        // sets connection timeout
+        $this->connection->set(CURLOPT_CONNECTTIMEOUT_MS, $timeout);
+    }
+    
+    public function execute(bool $returnTransfer = true, int $maxRedirectionsAllowed = 0, int $timeout = 300000): Response
+    {
+        $response = parent::execute($returnTransfer, $maxRedirectionsAllowed, $timeout);
+        fclose($this->fileHandle);
+        return $response;
     }
 }

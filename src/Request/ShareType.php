@@ -7,6 +7,6 @@ namespace Lucinda\URL\Request;
 interface ShareType
 {
     const COOKIES = CURL_LOCK_DATA_COOKIE;
-    const DNS = CURL_LOCK_DATA_DNS;
+    const DNS_CACHE = CURL_LOCK_DATA_DNS;
     const SSL_SESSION = CURL_LOCK_DATA_SSL_SESSION;
 }

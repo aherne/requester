@@ -1,6 +1,9 @@
 <?php
 namespace Lucinda\URL\Request;
 
+use Lucinda\URL\Cookie;
+use Lucinda\URL\Connection\Single as Connection;
+
 /**
  * Encapsulates HTTP request headers to send
  */
@@ -24,13 +27,13 @@ class Headers
     private $connection;
     
     /**
-     * Sets cURL handle to perform operations on.
+     * Sets connection to perform operations on.
      * 
-     * @param resource $curl
+     * @param Connection $connection
      */
-    public function __construct($curl)
+    public function __construct(Connection $connection)
     {
-        $this->connection = $curl;
+        $this->connection = $connection;
     }
     
     /**
@@ -40,9 +43,8 @@ class Headers
      */
     public function setIfModifiedSince(int $unixTime): void
     {
-        curl_setopt($this->connection, CURLOPT_HEADER, true);
-        curl_setopt($this->connection, CURLOPT_TIMECONDITION, CURL_TIMECOND_IFMODSINCE);
-        curl_setopt($this->connection, CURLOPT_TIMEVALUE, $unixTime);
+        $this->connection->set(CURLOPT_TIMECONDITION, CURL_TIMECOND_IFMODSINCE);
+        $this->connection->set(CURLOPT_TIMEVALUE, $unixTime);
     }
     
     /**
@@ -52,9 +54,8 @@ class Headers
      */
     public function setIfUnmodifiedSince(int $unixTime): void
     {
-        curl_setopt($this->connection, CURLOPT_HEADER, true);
-        curl_setopt($this->connection, CURLOPT_TIMECONDITION, CURL_TIMECOND_IFUNMODSINCE);
-        curl_setopt($this->connection, CURLOPT_TIMEVALUE, $unixTime);
+        $this->connection->set(CURLOPT_TIMECONDITION, CURL_TIMECOND_IFUNMODSINCE);
+        $this->connection->set(CURLOPT_TIMEVALUE, $unixTime);
     }
     
     /**
@@ -64,7 +65,7 @@ class Headers
      */
     public function setUserAgent(string $userAgent): void
     {
-        curl_setopt($this->connection, CURLOPT_USERAGENT, $userAgent);
+        $this->connection->set(CURLOPT_USERAGENT, $userAgent);
     }
     
     /**
@@ -74,27 +75,17 @@ class Headers
      */
     public function setReferer(string $referer): void
     {
-        curl_setopt($this->connection, CURLOPT_REFERER, $referer);
-    }
-    
-    /**
-     * Compiles an Authorization Bearer header based on OAuth2 access token received
-     * 
-     * @param string $accessToken
-     */
-    public function setOAuth2Bearer(string $accessToken): void
-    {
-        curl_setopt($this->connection, CURLOPT_XOAUTH2_BEARER, $accessToken);
+        $this->connection->set(CURLOPT_REFERER, $referer);
     }
     
     /**
      * Compiles a Cookie header based on argument received
      * 
-     * @param string $cookie
+     * @param Cookie $cookie
      */
-    public function setCookie(string $cookie): void
+    public function setCookie(Cookie $cookie): void
     {
-        curl_setopt($this->connection, CURLOPT_COOKIE, $cookie);
+        $this->connection->set(CURLOPT_COOKIE, $cookie->toHeader());
     }
     
     /**
@@ -110,11 +101,8 @@ class Headers
         if (isset(self::COVERED_HEADERS[$lowerName])) {
             throw new Exception("Header already covered by ".self::COVERED_HEADERS[$lowerName]." method!");
         }
-        if ($lowerName=="Authorization" && strpos(trim(strtolower($value)), "bearer ")===0) {
-            throw new Exception("Header already covered by setOAuth2Bearer method!");
-        }
         $this->customHeaders[] = $name.": ".$value;
-        curl_setopt($this->connection, CURLOPT_HTTPHEADER, $this->customHeaders);
+        $this->connection->set(CURLOPT_HTTPHEADER, $this->customHeaders);
     }
 }
 

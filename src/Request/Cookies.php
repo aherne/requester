@@ -1,8 +1,9 @@
 <?php
 namespace Lucinda\URL\Request;
 
+use Lucinda\URL\Connection\Single as Connection;
 use Lucinda\URL\FileNotFoundException;
-use Lucinda\URL\Cookie\Cookie;
+use Lucinda\URL\Cookie;
 
 /**
  * Encapsulates operations in working with request/response cookies
@@ -12,13 +13,13 @@ class Cookies
     private $connection;
     
     /**
-     * Sets cURL handle to perform operations on.
+     * Sets connection to perform operations on.
      * 
-     * @param resource $curl
+     * @param Connection $connection
      */
-    public function __construct($curl)
+    public function __construct(Connection $connection)
     {
-        $this->connection = $curl;
+        $this->connection = $connection;
     }
     
     /**
@@ -26,7 +27,7 @@ class Cookies
      */
     public function startNewSession(): void
     {
-        \curl_setopt($this->connection, CURLOPT_COOKIESESSION, true);
+        $this->connection->set(CURLOPT_COOKIESESSION, true);
     }
     
     /**
@@ -44,7 +45,7 @@ class Cookies
         if (!is_readable($file)) {
             throw new Exception("Cookies file not readable: ".$file);
         }
-        \curl_setopt($this->connection, CURLOPT_COOKIEFILE, $file);
+        $this->connection->set(CURLOPT_COOKIEFILE, $file);
     }
     // file to write cookies to when closing handle
     
@@ -63,23 +64,17 @@ class Cookies
         if (!is_writable($file)) {
             throw new Exception("Cookies file not writable: ".$file);
         }
-        \curl_setopt($this->connection, CURLOPT_COOKIEJAR, $file);
+        $this->connection->set(CURLOPT_COOKIEJAR, $file);
     }
     
     /**
-     * Deletes all cookies held in memory
+     * Adds cookie held in memory, to be written to container file identified by setFileToWrite method
+     *
+     * @param Cookie $cookie
      */
-    public function deleteAll(): void
+    public function write(Cookie $cookie): void
     {
-        \curl_setopt($this->connection, CURLOPT_COOKIELIST, "ALL");
-    }
-    
-    /**
-     * Deletes only session cookies held in memory
-     */
-    public function deleteSession(): void
-    {
-        \curl_setopt($this->connection, CURLOPT_COOKIELIST, "SESS");
+        $this->connection->set(CURLOPT_COOKIELIST, $cookie->toString());
     }
     
     /**
@@ -87,7 +82,7 @@ class Cookies
      */
     public function flushAll(): void
     {
-        \curl_setopt($this->connection, CURLOPT_COOKIELIST, "FLUSH");
+        $this->connection->set(CURLOPT_COOKIELIST, "FLUSH");
     }
     
     /**
@@ -95,27 +90,23 @@ class Cookies
      */
     public function reloadAll(): void
     {
-        \curl_setopt($this->connection, CURLOPT_COOKIELIST, "RELOAD");
+        $this->connection->set(CURLOPT_COOKIELIST, "RELOAD");
     }
     
     /**
-     * Gets all cookies from handle.
-     * 
-     * @return string
+     * Deletes only session cookies held in memory
      */
-    public function getAll(): string
+    public function deleteSession(): void
     {
-        return \curl_getinfo($this->connection, CURLOPT_COOKIELIST);
+        $this->connection->set(CURLOPT_COOKIELIST, "SESS");
     }
     
     /**
-     * Adds cookie held in memory, to be written to container file identified by setFileToWrite method
-     * 
-     * @param Cookie $cookie
+     * Deletes all cookies held in memory
      */
-    public function write(Cookie $cookie): void
+    public function deleteAll(): void
     {
-        \curl_setopt($this->connection, CURLOPT_COOKIELIST, "Set-Cookie: ".$cookie->toString());
+        $this->connection->set(CURLOPT_COOKIELIST, "ALL");
     }
 }
 
