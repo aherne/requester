@@ -77,7 +77,7 @@ class MultiRequest
                     {
                         $position = strpos($header, ":");
                         if($position !== false) {
-                            $headers[$key][strtolower(trim(substr($header, 0, $position)))] = trim(substr($header, $position+1));
+                            $headers[$key][ucwords(trim(substr($header, 0, $position)), "-")] = trim(substr($header, $position+1));
                         }
                         return strlen($header);
                     }

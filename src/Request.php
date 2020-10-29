@@ -250,7 +250,7 @@ class Request
                 {                    
                     $position = strpos($header, ":");
                     if($position !== false) {
-                        $headers[strtolower(trim(substr($header, 0, $position)))] = trim(substr($header, $position+1));
+                        $headers[ucwords(trim(substr($header, 0, $position)), "-")] = trim(substr($header, $position+1));
                     }
                     return strlen($header);
                 }
