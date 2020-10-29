@@ -69,6 +69,6 @@ class ResponseTest
     public function getHeaders()
     {
         $headers = $this->object->getHeaders();
-        return new Result(!empty($headers["Set-Cookie"]) && strpos($headers["Set-Cookie"], "PHPSESSID=")===0);
+        return new Result(!empty($headers["set-cookie"]) && strpos($headers["set-cookie"], "PHPSESSID=")===0);
     }
 }
