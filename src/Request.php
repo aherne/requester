@@ -5,7 +5,6 @@ use Lucinda\URL\Connection\Single as Connection;
 use Lucinda\URL\Request\Exception as RequestException;
 use Lucinda\URL\Response\Exception as ResponseException;
 use Lucinda\URL\Request\Headers;
-use Lucinda\URL\Request\Cookies;
 use Lucinda\URL\Request\SSL;
 use Lucinda\URL\Request\Method;
 use Lucinda\URL\Request\Parameters;
@@ -139,16 +138,6 @@ class Request
     }
     
     /**
-     * Sets session/cookies policy through Cookies object returned.
-     *
-     * @return Headers
-     */
-    public function setCookies(): Cookies
-    {
-        return new Cookies($this->connection);
-    }
-    
-    /**
      * Sets SQL policy through SSL object returned.
      * 
      * @param string $certificateAuthorityBundlePath
@@ -176,7 +165,7 @@ class Request
     }
     
     /**
-     * (ONLY FOR INTERNAL USAGE!) Gets connection object inside
+     * Gets connection object inside
      * 
      * @return Connection
      */

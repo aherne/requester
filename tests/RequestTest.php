@@ -5,7 +5,7 @@ use Lucinda\URL\Request;
 use Lucinda\UnitTest\Result;
 use Lucinda\URL\Request\Method;
 use Lucinda\URL\Cookie;
-use Lucinda\URL\Request\Exception;
+use Lucinda\URL\Connection\Single as Connection;
 
 class RequestTest
 {
@@ -64,25 +64,6 @@ class RequestTest
     }
         
 
-    public function setCookies()
-    {
-        $file = dirname(__DIR__).DIRECTORY_SEPARATOR."cookies.txt";
-        file_put_contents($file, "");
-        
-        $request = new Request(RECEIVER_HTTP."?newcookie=1");
-        $cookies = $request->setCookies();
-        $cookies->setFileToRead($file);
-        $cookies->setFileToWrite($file);
-        $request->execute();
-        $cookies->flushAll();
-        $contents = file_get_contents($file);
-        
-        unlink($file);
-        
-        return new Result(strpos($contents, "hello\tworld"));
-    }
-        
-
     public function setSSL()
     {
         $request = new Request(RECEIVER_HTTPS);
@@ -103,7 +84,8 @@ class RequestTest
 
     public function getConnection()
     {
-        return new Result(true, "tested via Connection\MultiRequestTest or Connection\SharedRequestTest");
+        $request = new Request(RECEIVER_HTTP);
+        return new Result($request->getConnection() instanceof Connection);
     }
         
 

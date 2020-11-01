@@ -4,6 +4,7 @@ namespace Test\Lucinda\URL;
 use Lucinda\URL\SharedRequest;
 use Lucinda\URL\Request;
 use Lucinda\UnitTest\Result;
+use Lucinda\URL\Cookies;
 
 class SharedRequestTest
 {
@@ -13,12 +14,14 @@ class SharedRequestTest
         
         $request1 = new Request(RECEIVER_HTTP);
         $sharedRequest->add($request1);
-        $response1 = $request1->execute();
+        $cookies1 = new Cookies($request1->getConnection());
+        $request1->execute();
         
         $request2 = new Request(RECEIVER_HTTP);
         $sharedRequest->add($request2);
-        $response2 = $request2->execute();
+        $cookies2 = new Cookies($request2->getConnection());
+        $request2->execute();
         
-        return new Result($response1->getCookies()[0]->toString() == $response2->getCookies()[0]->toString());
+        return new Result($cookies1->getAll()[0]->toString() == $cookies2->getAll()[0]->toString());
     }
 }

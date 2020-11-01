@@ -71,12 +71,6 @@ class FileDownloadTest
     }
         
 
-    public function setCookies()
-    {
-        return new Result(true, "tested via RequestTest::setCookies");
-    }
-        
-
     public function setSSL()
     {
         return new Result(true, "tested via RequestTest::setSSL");

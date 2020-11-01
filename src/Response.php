@@ -19,7 +19,6 @@ class Response
     private $connection;
     
     private $url;
-    private $cookies = [];
     private $duration;
     private $responseCode;
     private $body;
@@ -37,7 +36,6 @@ class Response
     {
         $this->connection = $connection;
         
-        $this->setCookies();
         $this->setDuration($duration);
         $this->setStatusCode();
         $this->setURL();
@@ -57,42 +55,6 @@ class Response
             throw new ResponseException("Option already covered by ".self::COVERED_OPTIONS[$curlinfo]." method!");
         }
         return $this->connection->get($curlinfo);
-    }
-    
-    /**
-     * Sets list of cookies received from response
-     */
-    private function setCookies(): void
-    {
-        $temp = $this->connection->get(CURLINFO_COOKIELIST);
-        $cookies = [];
-        foreach($temp as $cookie) {
-            $parts = explode("\t", $cookie);
-            $cookie = new Cookie($parts[5], $parts[6]);
-            if (stripos($parts[0], "#HttpOnly_")) {
-                $cookie->setDomain(str_replace("#HttpOnly_", "", $parts[0]), ($parts[1]=="TRUE"));
-                $cookie->setSecuredByHTTPheaders();
-            } else {
-                $cookie->setDomain($parts[0], ($parts[1]=="TRUE"));
-            }
-            $cookie->setPath($parts[2]);
-            if ($parts[3] == "TRUE") {
-                $cookie->setSecuredByHTTPheaders();
-            }
-            $cookie->setMaxAge((int) $parts[4]);
-            $cookies[] = $cookie;
-        }
-        $this->cookies = $cookies;
-    }
-    
-    /**
-     * Gets list of cookies received from response
-     *
-     * @return array
-     */
-    public function getCookies(): array
-    {
-        return $this->cookies;
     }
     
     /**

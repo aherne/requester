@@ -1,5 +1,5 @@
 <?php
-namespace Lucinda\URL\Request;
+namespace Lucinda\URL;
 
 use Lucinda\URL\Connection\Single as Connection;
 use Lucinda\URL\FileNotFoundException;
@@ -35,34 +35,25 @@ class Cookies
      * 
      * @param string $file
      * @throws FileNotFoundException
-     * @throws Exception
      */
     public function setFileToRead(string $file): void
     {
         if (!file_exists($file)) {
             throw new FileNotFoundException($file);
         }
-        if (!is_readable($file)) {
-            throw new Exception("Cookies file not readable: ".$file);
-        }
         $this->connection->set(CURLOPT_COOKIEFILE, $file);
     }
-    // file to write cookies to when closing handle
     
     /**
      * Sets file to write cookies to automatically after Request is destructed
      *
      * @param string $file
      * @throws FileNotFoundException
-     * @throws Exception
      */
     public function setFileToWrite(string $file): void
     {
         if (!file_exists($file)) {
             throw new FileNotFoundException($file);
-        }
-        if (!is_writable($file)) {
-            throw new Exception("Cookies file not writable: ".$file);
         }
         $this->connection->set(CURLOPT_COOKIEJAR, $file);
     }
@@ -75,6 +66,34 @@ class Cookies
     public function write(Cookie $cookie): void
     {
         $this->connection->set(CURLOPT_COOKIELIST, $cookie->toString());
+    }
+    
+    /**
+     * Gets all cookies in memory
+     * 
+     * @return Cookie[]
+     */
+    public function getAll(): array
+    {        
+        $temp = $this->connection->get(CURLINFO_COOKIELIST);
+        $cookies = [];
+        foreach($temp as $cookie) {
+            $parts = explode("\t", $cookie);
+            $cookie = new Cookie($parts[5], $parts[6]);
+            if (stripos($parts[0], "#HttpOnly_")) {
+                $cookie->setDomain(str_replace("#HttpOnly_", "", $parts[0]), ($parts[1]=="TRUE"));
+                $cookie->setSecuredByHTTPheaders();
+            } else {
+                $cookie->setDomain($parts[0], ($parts[1]=="TRUE"));
+            }
+            $cookie->setPath($parts[2]);
+            if ($parts[3] == "TRUE") {
+                $cookie->setSecuredByHTTPheaders();
+            }
+            $cookie->setMaxAge((int) $parts[4]);
+            $cookies[] = $cookie;
+        }
+        return $cookies;
     }
     
     /**

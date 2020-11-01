@@ -21,26 +21,6 @@ class ResponseTest
     }
         
 
-    public function getCookies()
-    {
-        $file = dirname(__DIR__).DIRECTORY_SEPARATOR."cookies.txt";
-        
-        file_put_contents($file, "");
-        
-        $request = new Request(RECEIVER_HTTP);
-        $cookies = $request->setCookies();
-        $cookies->write(new Cookie("test", "me"));
-        $cookies->setFileToRead($file);
-        $cookies->setFileToWrite($file);
-        $response = $request->execute();
-        $cookies->flushAll();
-        
-        unlink($file);
-                
-        return new Result(!empty($response->getCookies()));
-    }
-        
-
     public function getDuration()
     {
         return new Result($this->object->getDuration() > 0);
