@@ -13,7 +13,7 @@ class SSL
     
     /**
      * Sets connection to perform operations on as well as file holding public PEM certificate.
-     * 
+     *
      * @param Connection $connection
      * @param string $certificateAuthorityBundlePath
      * @throws FileNotFoundException.
@@ -33,7 +33,7 @@ class SSL
     
     /**
      * Sets client SSL certificate by file path and optional password
-     * 
+     *
      * @param string $path
      * @param string $password
      * @throws FileNotFoundException
@@ -51,7 +51,7 @@ class SSL
     
     /**
      * Sets private keyfile for SSL certificate by file path and optional password
-     * 
+     *
      * @param string $path
      * @param string $password
      * @throws FileNotFoundException
@@ -65,6 +65,5 @@ class SSL
         if ($password) {
             $this->connection->set(CURLOPT_SSLKEYPASSWD, $password);
         }
-    }    
+    }
 }
-

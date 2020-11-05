@@ -32,7 +32,7 @@ class FileDownload extends Request
     
     /**
      * Sets location where file will be downloaded
-     * 
+     *
      * @param string $path
      */
     public function setFile(string $path): void
@@ -49,7 +49,7 @@ class FileDownload extends Request
     {
         if (isset(self::ADDITIONAL_COVERED_OPTIONS[$curlopt])) {
             throw new RequestException("Option already covered by ".self::ADDITIONAL_COVERED_OPTIONS[$curlopt]." method!");
-        } else if (isset(self::COVERED_OPTIONS[$curlopt])) {
+        } elseif (isset(self::COVERED_OPTIONS[$curlopt])) {
             throw new RequestException("Option already covered by ".self::COVERED_OPTIONS[$curlopt]." method!");
         }
         $this->connection->set($curlopt, $value);
@@ -64,9 +64,9 @@ class FileDownload extends Request
     {
         $this->connection->set(CURLOPT_BUFFERSIZE, $progressHandler->getBufferSize());
         $this->connection->set(CURLOPT_NOPROGRESS, false);
-        $this->connection->set(CURLOPT_PROGRESSFUNCTION,
-            function($curl, int $downloadSize, int $downloaded, int $uploadSize, int $uploaded) use ($progressHandler)
-            {
+        $this->connection->set(
+            CURLOPT_PROGRESSFUNCTION,
+            function ($curl, int $downloadSize, int $downloaded, int $uploadSize, int $uploaded) use ($progressHandler) {
                 $progressHandler->handle($downloadSize, $downloaded);
             }
         );

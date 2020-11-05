@@ -1,12 +1,11 @@
 <?php
 namespace Test\Lucinda\URL\Request;
-    
+
 use Lucinda\URL\Request;
 use Lucinda\UnitTest\Result;
 
 class SSLTest
 {
-
     public function setCertificate()
     {
         $request = new Request(RECEIVER_HTTPS);
@@ -24,6 +23,4 @@ class SSLTest
         $response = $request->execute();
         return new Result(json_decode($response->getBody(), true)["body"]=="OK");
     }
-        
-
 }

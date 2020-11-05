@@ -3,8 +3,9 @@ namespace Test\Lucinda\URL;
 
 use Lucinda\URL\Request;
 use Lucinda\UnitTest\Result;
-use Lucinda\URL\Cookie;
+use Lucinda\URL\Cookies\Cookie;
 use Lucinda\URL\Cookies;
+use Lucinda\URL\Cookies\CookieFile;
 
 class CookiesTest
 {
@@ -38,7 +39,8 @@ class CookiesTest
         
         unlink($this->file);
         
-        return new Result($cookies1[0]->toString() != $cookies2[0]->toString());
+        $cookieFile = new CookieFile();
+        return new Result($cookieFile->encrypt($cookies1[0]) != $cookieFile->encrypt($cookies2[0]));
     }
     
     
@@ -80,7 +82,6 @@ class CookiesTest
     
     public function reloadAll()
     {
-        
     }
     
     
@@ -134,8 +135,7 @@ class CookiesTest
         
         unlink($this->file);
         
-        return new Result(!empty($cookies1) && strpos($cookies1[0]->toString(), "PHPSESSID")!==false);
+        $cookieFile = new CookieFile();
+        return new Result(!empty($cookies1) && strpos($cookieFile->encrypt($cookies1[0]), "PHPSESSID")!==false);
     }
-        
-
 }

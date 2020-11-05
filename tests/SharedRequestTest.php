@@ -1,10 +1,11 @@
 <?php
 namespace Test\Lucinda\URL;
-    
+
 use Lucinda\URL\SharedRequest;
 use Lucinda\URL\Request;
 use Lucinda\UnitTest\Result;
 use Lucinda\URL\Cookies;
+use Lucinda\URL\Cookies\CookieFile;
 
 class SharedRequestTest
 {
@@ -22,6 +23,7 @@ class SharedRequestTest
         $cookies2 = new Cookies($request2->getConnection());
         $request2->execute();
         
-        return new Result($cookies1->getAll()[0]->toString() == $cookies2->getAll()[0]->toString());
+        $cookieFile = new CookieFile();
+        return new Result($cookieFile->encrypt($cookies1->getAll()[0]) == $cookieFile->encrypt($cookies2->getAll()[0]));
     }
 }

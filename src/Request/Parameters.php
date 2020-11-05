@@ -14,14 +14,14 @@ class Parameters
     
     /**
      * Sets connection to perform operations on. Optionally includes key-value set of POST parameters to add already.
-     * 
+     *
      * @param resource $curl
      * @param Connection $connection
      */
     public function __construct(Connection $connection, array $parameters = [])
     {
         $this->connection = $connection;
-        if ($parameters) {            
+        if ($parameters) {
             $this->parameters = $parameters;
             $this->connection->set(CURLOPT_POSTFIELDS, $this->parameters);
         }
@@ -29,7 +29,7 @@ class Parameters
     
     /**
      * Adds a POST parameter by key and value (to be accessible as $_POST in response)
-     * 
+     *
      * @param string $key
      * @param mixed $value
      */
@@ -41,7 +41,7 @@ class Parameters
     
     /**
      * Adds a POST parameter by key and file path/name (to be accessible as $_FILES in response)
-     * 
+     *
      * @param string $key
      * @param string $path
      * @param string $name
@@ -56,4 +56,3 @@ class Parameters
         $this->connection->set(CURLOPT_POSTFIELDS, $this->parameters);
     }
 }
-

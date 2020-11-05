@@ -1,15 +1,14 @@
 <?php
 namespace Test\Lucinda\URL;
-    
+
 use Lucinda\URL\Request;
 use Lucinda\UnitTest\Result;
 use Lucinda\URL\Request\Method;
-use Lucinda\URL\Cookie;
+use Lucinda\URL\Cookies\Cookie;
 use Lucinda\URL\Connection\Single as Connection;
 
 class RequestTest
 {
-
     public function setURL()
     {
         $request = new Request();
@@ -56,11 +55,12 @@ class RequestTest
         $payload = json_decode($response->getBody(), true);
         $receivedHeaders = $payload["headers"];
         return new Result(
-            $receivedHeaders["Cookie"] == "key=value; Path=/" && 
-            strtotime($receivedHeaders["If-Modified-Since"]) == time()+10 && 
-            $receivedHeaders["Referer"]=="http://www.example.com" && 
+            $receivedHeaders["Cookie"] == "key=value; Path=/" &&
+            strtotime($receivedHeaders["If-Modified-Since"]) == time()+10 &&
+            $receivedHeaders["Referer"]=="http://www.example.com" &&
             $receivedHeaders["User-Agent"]=="Google Chrome" &&
-            $receivedHeaders["Content-Type"]=="application/json");
+            $receivedHeaders["Content-Type"]=="application/json"
+        );
     }
         
 
@@ -80,7 +80,7 @@ class RequestTest
         $request->setCustomOption(CURLOPT_PRIVATE, "private data");
         $response = $request->execute();
         return new Result($response->getCustomOption(CURLINFO_PRIVATE) == "private data");
-    }        
+    }
 
     public function getConnection()
     {
@@ -122,6 +122,4 @@ class RequestTest
         
         return $output;
     }
-        
-
 }

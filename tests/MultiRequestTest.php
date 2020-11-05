@@ -1,6 +1,6 @@
 <?php
 namespace Test\Lucinda\URL;
-    
+
 use Lucinda\URL\MultiRequest;
 use Lucinda\URL\Request;
 use Lucinda\UnitTest\Result;
@@ -21,7 +21,7 @@ class MultiRequestTest
 
     public function add()
     {
-        foreach(self::URLS_TESTED as $url) {
+        foreach (self::URLS_TESTED as $url) {
             $this->object->add(new Request($url));
         }
         return new Result(true);
@@ -46,5 +46,5 @@ class MultiRequestTest
             $i++;
         }
         return $output;
-    }        
+    }
 }

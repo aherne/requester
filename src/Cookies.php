@@ -2,8 +2,8 @@
 namespace Lucinda\URL;
 
 use Lucinda\URL\Connection\Single as Connection;
-use Lucinda\URL\FileNotFoundException;
-use Lucinda\URL\Cookie;
+use Lucinda\URL\Cookies\Cookie;
+use Lucinda\URL\Cookies\CookieFile;
 
 /**
  * Encapsulates operations in working with request/response cookies
@@ -14,7 +14,7 @@ class Cookies
     
     /**
      * Sets connection to perform operations on.
-     * 
+     *
      * @param Connection $connection
      */
     public function __construct(Connection $connection)
@@ -32,7 +32,7 @@ class Cookies
     
     /**
      * Sets file to read cookies from
-     * 
+     *
      * @param string $file
      * @throws FileNotFoundException
      */
@@ -65,33 +65,22 @@ class Cookies
      */
     public function write(Cookie $cookie): void
     {
-        $this->connection->set(CURLOPT_COOKIELIST, $cookie->toString());
+        $cookieFile = new CookieFile();
+        $this->connection->set(CURLOPT_COOKIELIST, $cookieFile->encrypt($cookie));
     }
     
     /**
      * Gets all cookies in memory
-     * 
+     *
      * @return Cookie[]
      */
     public function getAll(): array
-    {        
+    {
         $temp = $this->connection->get(CURLINFO_COOKIELIST);
         $cookies = [];
-        foreach($temp as $cookie) {
-            $parts = explode("\t", $cookie);
-            $cookie = new Cookie($parts[5], $parts[6]);
-            if (stripos($parts[0], "#HttpOnly_")) {
-                $cookie->setDomain(str_replace("#HttpOnly_", "", $parts[0]), ($parts[1]=="TRUE"));
-                $cookie->setSecuredByHTTPheaders();
-            } else {
-                $cookie->setDomain($parts[0], ($parts[1]=="TRUE"));
-            }
-            $cookie->setPath($parts[2]);
-            if ($parts[3] == "TRUE") {
-                $cookie->setSecuredByHTTPheaders();
-            }
-            $cookie->setMaxAge((int) $parts[4]);
-            $cookies[] = $cookie;
+        foreach ($temp as $cookie) {
+            $cookieFile = new CookieFile();
+            $cookies[] = $cookieFile->decrypt($cookie);
         }
         return $cookies;
     }
@@ -128,4 +117,3 @@ class Cookies
         $this->connection->set(CURLOPT_COOKIELIST, "ALL");
     }
 }
-

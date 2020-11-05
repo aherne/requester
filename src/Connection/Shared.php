@@ -5,7 +5,7 @@ namespace Lucinda\URL\Connection;
  * Encapsulates a shared URL connection (enveloping curl_share_* functions)
  */
 class Shared
-{    
+{
     private $connection;
     
     /**
@@ -36,7 +36,7 @@ class Shared
     
     /**
      * Sets multi-connection option
-     * 
+     *
      * @param int $option CURLSHOPT_* constant
      * @param mixed $value
      */
@@ -45,4 +45,3 @@ class Shared
         \curl_share_setopt($this->connection, $option, $value);
     }
 }
-

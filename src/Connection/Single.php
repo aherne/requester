@@ -28,7 +28,7 @@ class Single
     
     /**
      * Sets connection option
-     * 
+     *
      * @param int $option CURLOPT_* constant
      * @param mixed $value
      */
@@ -39,7 +39,7 @@ class Single
     
     /**
      * Gets connection option
-     * 
+     *
      * @param int $option CURLINFO_* constant
      * @return mixed
      */
@@ -50,7 +50,7 @@ class Single
     
     /**
      * (ONLY FOR INTERNAL USAGE!) Builds a CURLFile object to be sent in POST requests based on arguments
-     * 
+     *
      * @param string $path
      * @param string $name
      * @return mixed
@@ -62,7 +62,7 @@ class Single
     
     /**
      * Executes request and returns response body
-     * 
+     *
      * @throws Exception
      * @return mixed
      */
@@ -77,7 +77,7 @@ class Single
     
     /**
      * (ONLY FOR INTERNAL USAGE!) Gets curl driver underneath. Necessary only for multiconnections!
-     * 
+     *
      * @return resource
      */
     public function getDriver()
@@ -85,4 +85,3 @@ class Single
         return $this->connection;
     }
 }
-

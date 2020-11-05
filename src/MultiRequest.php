@@ -20,7 +20,7 @@ class MultiRequest
      * - HTTP1: attempts to pipeline HTTP/1.1 requests on connections that are already established
      * - HTTP2: attempts to multiplex the new transfer over an existing connection if HTTP/2
      * - HTTP1_HTTP2: attempts pipelining and multiplexing independently of each other
-     * 
+     *
      * @param Pipelining $pipeliningOption One of enum values (eg: Pipelining::HTTP2)
      */
     public function __construct(int $pipeliningOption = Pipelining::HTTP1_HTTP2)
@@ -31,7 +31,7 @@ class MultiRequest
         
     /**
      * Adds request to be executed asynchronously
-     * 
+     *
      * @param Request $request
      */
     public function add(Request $request): void
@@ -58,7 +58,7 @@ class MultiRequest
     
     /**
      * Validates requests then executes them asynchronously in order to produce responses
-     * 
+     *
      * @param int $returnTransfer Whether or not response body should be returned for each request
      * @param int $maxRedirectionsAllowed Maximum number of redirections allowed (if zero, it means none are) for each request
      * @param int $timeout Connection timeout in milliseconds for each request
@@ -68,15 +68,15 @@ class MultiRequest
     public function execute(bool $returnTransfer = true, int $maxRedirectionsAllowed = 0, int $timeout = 300000): array
     {
         // prepares handles for execution
-        $headers =[]; 
-        foreach($this->children as $key=>$request) {
+        $headers =[];
+        foreach ($this->children as $key=>$request) {
             $request->prepare($returnTransfer, $maxRedirectionsAllowed, $timeout);
             if ($returnTransfer) {
-                $request->getConnection()->set(CURLOPT_HEADERFUNCTION,
-                    function($curl, $header) use (&$headers, $key)
-                    {
+                $request->getConnection()->set(
+                    CURLOPT_HEADERFUNCTION,
+                    function ($curl, $header) use (&$headers, $key) {
                         $position = strpos($header, ":");
-                        if($position !== false) {
+                        if ($position !== false) {
                             $headers[$key][ucwords(trim(substr($header, 0, $position)), "-")] = trim(substr($header, $position+1));
                         }
                         return strlen($header);
@@ -87,7 +87,7 @@ class MultiRequest
                 
         // executes multi-request and compiles responses
         $bodies = $this->connection->execute($headers, $returnTransfer);
-        foreach($this->children as $key=>$request) {
+        foreach ($this->children as $key=>$request) {
             $connection = $request->getConnection();
             if ($returnTransfer) {
                 $responses[$key] = new Response($connection, $bodies[$key], $headers[$key]);
@@ -99,4 +99,3 @@ class MultiRequest
         return $responses;
     }
 }
-

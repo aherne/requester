@@ -1,9 +1,8 @@
 <?php
 namespace Test\Lucinda\URL;
-    
+
 use Lucinda\URL\Request;
 use Lucinda\UnitTest\Result;
-use Lucinda\URL\Cookie;
 
 class ResponseTest
 {
@@ -43,8 +42,7 @@ class ResponseTest
     {
         $response = json_decode($this->object->getBody(), true);
         return new Result($response["body"] == "OK");
-        
-    }        
+    }
 
     public function getHeaders()
     {

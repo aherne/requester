@@ -1,8 +1,9 @@
 <?php
 namespace Lucinda\URL\Request;
 
-use Lucinda\URL\Cookie;
+use Lucinda\URL\Cookies\Cookie;
 use Lucinda\URL\Connection\Single as Connection;
+use Lucinda\URL\Cookies\CookieHeader;
 
 /**
  * Encapsulates HTTP request headers to send
@@ -28,7 +29,7 @@ class Headers
     
     /**
      * Sets connection to perform operations on.
-     * 
+     *
      * @param Connection $connection
      */
     public function __construct(Connection $connection)
@@ -38,7 +39,7 @@ class Headers
     
     /**
      * Compiles an If-Modified-Since header based on unix time received
-     * 
+     *
      * @param int $unixTime
      */
     public function setIfModifiedSince(int $unixTime): void
@@ -60,7 +61,7 @@ class Headers
     
     /**
      * Compiles an User-Agent header based on argument received
-     * 
+     *
      * @param string $userAgent
      */
     public function setUserAgent(string $userAgent): void
@@ -80,17 +81,18 @@ class Headers
     
     /**
      * Compiles a Cookie header based on argument received
-     * 
+     *
      * @param Cookie $cookie
      */
     public function setCookie(Cookie $cookie): void
     {
-        $this->connection->set(CURLOPT_COOKIE, $cookie->toHeader());
+        $cookieHeader = new CookieHeader();
+        $this->connection->set(CURLOPT_COOKIE, $cookieHeader->encrypt($cookie));
     }
     
     /**
      * Adds a custom HTTP request header not covered already
-     * 
+     *
      * @param string $name
      * @param string $value
      * @throws Exception If header is already covered by one of specialized class methodss
@@ -105,4 +107,3 @@ class Headers
         $this->connection->set(CURLOPT_HTTPHEADER, $this->customHeaders);
     }
 }
-

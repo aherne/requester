@@ -22,4 +22,3 @@ class FileTransferProgress implements Progress
         return $this->chunks;
     }
 }
-

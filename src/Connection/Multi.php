@@ -24,7 +24,7 @@ class Multi
      */
     public function __destruct()
     {
-        foreach($this->children as $child) {
+        foreach ($this->children as $child) {
             \curl_multi_remove_handle($this->connection, $child);
         }
         \curl_multi_close($this->connection);
@@ -32,7 +32,7 @@ class Multi
     
     /**
      * Adds a simple connection to pool
-     * 
+     *
      * @param Single $connection
      */
     public function add(Single $connection): void
@@ -44,7 +44,7 @@ class Multi
     
     /**
      * Sets multi-connection option
-     * 
+     *
      * @param int $option CURLMOPT_* constant
      * @param mixed $value
      */
@@ -55,7 +55,7 @@ class Multi
     
     /**
      * Executes multi-connection and returns response body for each connection pooled
-     * 
+     *
      * @param array $headers
      * @param bool $returnTransfer
      * @throws Exception
@@ -88,4 +88,3 @@ class Multi
         return $responses;
     }
 }
-

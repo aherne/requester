@@ -39,8 +39,7 @@ class FileUpload extends Request
      */
     public function setMethod(string $method): void
     {
-        switch($method)
-        {
+        switch ($method) {
             case Method::POST:
                 $this->connection->set(CURLOPT_POST, true);
                 break;
@@ -81,7 +80,7 @@ class FileUpload extends Request
     
     /**
      * Sets raw (binary) content to be uploaded using POST
-     * 
+     *
      * @param string $body
      */
     public function setRaw(string $body): void
@@ -95,10 +94,10 @@ class FileUpload extends Request
      * @see \Lucinda\URL\Request::setCustomOption()
      */
     public function setCustomOption(int $curlopt, $value): void
-    {        
+    {
         if (isset(self::ADDITIONAL_COVERED_OPTIONS[$curlopt])) {
             throw new RequestException("Option already covered by ".self::ADDITIONAL_COVERED_OPTIONS[$curlopt]." method!");
-        } else if (isset(self::COVERED_OPTIONS[$curlopt])) {
+        } elseif (isset(self::COVERED_OPTIONS[$curlopt])) {
             throw new RequestException("Option already covered by ".self::COVERED_OPTIONS[$curlopt]." method!");
         }
         $this->connection->set($curlopt, $value);
@@ -113,13 +112,13 @@ class FileUpload extends Request
     {
         $this->connection->set(CURLOPT_BUFFERSIZE, $progressHandler->getBufferSize());
         $this->connection->set(CURLOPT_NOPROGRESS, false);
-        $this->connection->set(CURLOPT_PROGRESSFUNCTION,
-            function($curl, int $downloadSize, int $downloaded, int $uploadSize, int $uploaded) use ($progressHandler)
-            {
+        $this->connection->set(
+            CURLOPT_PROGRESSFUNCTION,
+            function ($curl, int $downloadSize, int $downloaded, int $uploadSize, int $uploaded) use ($progressHandler) {
                 $progressHandler->handle($uploadSize, $uploaded);
             }
         );
-    }    
+    }
     
     /**
      * {@inheritDoc}

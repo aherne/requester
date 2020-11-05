@@ -1,6 +1,6 @@
 <?php
 namespace Test\Lucinda\URL;
-    
+
 use Lucinda\URL\FileUpload;
 use Lucinda\URL\Request\Method;
 use Lucinda\UnitTest\Result;
@@ -87,7 +87,7 @@ class FileUploadTest
     public function setSSL()
     {
         return new Result(true, "tested via RequestTest::setSSL");
-    }       
+    }
 
     public function getDriver()
     {
@@ -110,6 +110,4 @@ class FileUploadTest
     {
         return new Result(true, "tested via Connection\MultiRequestTest or Connection\SharedRequestTest");
     }
-        
-
 }

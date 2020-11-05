@@ -16,4 +16,3 @@ interface Method
     const TRACE = "TRACE";
     const PATCH = "PATCH";
 }
-

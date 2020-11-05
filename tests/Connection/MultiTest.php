@@ -1,11 +1,10 @@
 <?php
 namespace Test\Lucinda\URL\Connection;
-    
+
 use Lucinda\UnitTest\Result;
 
 class MultiTest
 {
-
     public function add()
     {
         return new Result(true, "tested via MultiRequestTest::add");
@@ -22,6 +21,4 @@ class MultiTest
     {
         return new Result(true, "tested via MultiRequestTest::execute");
     }
-        
-
 }

@@ -1,6 +1,6 @@
 <?php
 namespace Test\Lucinda\URL;
-    
+
 use Lucinda\UnitTest\Result;
 use Lucinda\URL\FileDownload;
 use Lucinda\URL\Request\Method;
@@ -99,6 +99,4 @@ class FileDownloadTest
     {
         return new Result(true, "tested via Connection\MultiRequestTest or Connection\SharedRequestTest");
     }
-        
-
 }

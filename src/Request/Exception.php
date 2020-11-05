@@ -7,4 +7,3 @@ namespace Lucinda\URL\Request;
 class Exception extends \Exception
 {
 }
-

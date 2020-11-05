@@ -11,4 +11,3 @@ interface Pipelining
     const HTTP2 = CURLPIPE_MULTIPLEX;
     const HTTP1_HTTP2 = 3;
 }
-

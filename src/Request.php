@@ -11,7 +11,7 @@ use Lucinda\URL\Request\Parameters;
 
 /**
  * Encapsulates a GET HTTP/HTTPS request for any resource
- * 
+ *
  * TODO: add support for curl_copy_handle
  */
 class Request
@@ -55,7 +55,7 @@ class Request
     
     /**
      * Initiates a new URL connection or imports existing cURL handler
-     * 
+     *
      * @param ?string $url
      */
     public function __construct(?string $url = null)
@@ -68,7 +68,7 @@ class Request
     
     /**
      * Sets URL of requested resource
-     * 
+     *
      * @param string $url
      * @throws RequestException If URL is invalid
      */
@@ -83,14 +83,13 @@ class Request
     
     /**
      * Sets HTTP method to use in requesting resource. If not set, GET is used by default!
-     * 
+     *
      * @param Method $method One of enum values (eg: Method::POST)
      * @throws RequestException If HTTP method is invalid
      */
     public function setMethod(string $method): void
     {
-        switch($method)
-        {
+        switch ($method) {
             case Method::GET:
                 // do nothing
                 break;
@@ -117,7 +116,7 @@ class Request
     
     /**
      * Sets parameters to send in POST requests through Parameters object returned.
-     * 
+     *
      * @param array $parameters Optional key-value set of POST parameters to send already.
      * @return Parameters
      */
@@ -128,8 +127,8 @@ class Request
     }
     
     /**
-     * Sets HTTP headers to send through Headers object returned. 
-     * 
+     * Sets HTTP headers to send through Headers object returned.
+     *
      * @return Headers
      */
     public function setHeaders(): Headers
@@ -139,7 +138,7 @@ class Request
     
     /**
      * Sets SQL policy through SSL object returned.
-     * 
+     *
      * @param string $certificateAuthorityBundlePath
      * @return SSL
      */
@@ -151,7 +150,7 @@ class Request
     
     /**
      * Sets obscure CURLOPT not already covered by API.
-     * 
+     *
      * @param int $curlopt Curlopt option key (eg: CURLOPT_PRIVATE)
      * @param mixed $value
      * @throws RequestException If option already covered
@@ -166,7 +165,7 @@ class Request
     
     /**
      * Gets connection object inside
-     * 
+     *
      * @return Connection
      */
     public function getConnection(): Connection
@@ -176,7 +175,7 @@ class Request
             
     /**
      * Validates request and prepares it for being sent. Called already by "execute" method!
-     * 
+     *
      * @throws RequestException If request information is insufficient/invalid.
      */
     public function prepare(bool $returnTransfer = true, int $maxRedirectionsAllowed = 0, int $timeout = 300000): void
@@ -189,7 +188,7 @@ class Request
         // validate POST parameters
         if ($this->method == Method::POST && !$this->isPOST) {
             throw new RequestException("No parameters to POST!");
-        }        
+        }
         if ($this->method != Method::POST && $this->isPOST) {
             throw new RequestException("Parameters can't be used unless request method is POST");
         }
@@ -203,7 +202,7 @@ class Request
         }
         
         // sets redirection policy
-        if($maxRedirectionsAllowed==0) {
+        if ($maxRedirectionsAllowed==0) {
             $this->connection->set(CURLOPT_FOLLOWLOCATION, false);
         } else {
             $this->connection->set(CURLOPT_FOLLOWLOCATION, true);
@@ -219,7 +218,7 @@ class Request
     
     /**
      * Validates request then executes it in order to produce a response
-     * 
+     *
      * @param int $returnTransfer Whether or not response body should be returned
      * @param int $maxRedirectionsAllowed Maximum number of redirections allowed (if zero, it means none are)
      * @param int $timeout Connection timeout in milliseconds
@@ -234,11 +233,11 @@ class Request
         // registers response header processing
         $headers = [];
         if ($returnTransfer) {
-            $this->connection->set(CURLOPT_HEADERFUNCTION,
-                function($curl, $header) use (&$headers)
-                {                    
+            $this->connection->set(
+                CURLOPT_HEADERFUNCTION,
+                function ($curl, $header) use (&$headers) {
                     $position = strpos($header, ":");
-                    if($position !== false) {
+                    if ($position !== false) {
                         $headers[ucwords(trim(substr($header, 0, $position)), "-")] = trim(substr($header, $position+1));
                     }
                     return strlen($header);
@@ -255,4 +254,3 @@ class Request
         return new Response($this->connection, $body, $headers, ($endTime-$startTime));
     }
 }
-

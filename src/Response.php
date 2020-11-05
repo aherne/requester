@@ -26,7 +26,7 @@ class Response
     
     /**
      * Sets basic information, response body and headers
-     * 
+     *
      * @param Connection $connection
      * @param string $body
      * @param array $headers
@@ -66,7 +66,7 @@ class Response
     {
         if ($duration===0) {
             $this->duration = round($duration*1000);
-        } else if (defined("CURLINFO_TOTAL_TIME_T")) {
+        } elseif (defined("CURLINFO_TOTAL_TIME_T")) {
             $this->duration = round($this->connection->get(CURLINFO_TOTAL_TIME_T)/1000);
         } else {
             $this->duration = $this->connection->get(CURLINFO_TOTAL_TIME)*1000;
@@ -131,7 +131,7 @@ class Response
     
     /**
      * Gets response body
-     * 
+     *
      * @return string
      */
     public function getBody(): string
@@ -159,4 +159,3 @@ class Response
         return $this->headers;
     }
 }
-

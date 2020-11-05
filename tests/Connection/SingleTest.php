@@ -1,11 +1,10 @@
 <?php
 namespace Test\Lucinda\URL\Connection;
-    
+
 use Lucinda\UnitTest\Result;
 
 class SingleTest
 {
-
     public function set()
     {
         return new Result(true, "tested via RequestTest::setCustomOption");
@@ -32,6 +31,4 @@ class SingleTest
     {
         return new Result(true, "tested via Request\ParametersTest::addFile");
     }
-        
-
 }

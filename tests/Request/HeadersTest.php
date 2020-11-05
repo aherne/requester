@@ -1,11 +1,10 @@
 <?php
 namespace Test\Lucinda\URL\Request;
-    
+
 use Lucinda\UnitTest\Result;
 
 class HeadersTest
 {
-
     public function setIfModifiedSince()
     {
         return new Result(true, "tested via RequestTest::setHeaders");
@@ -40,6 +39,4 @@ class HeadersTest
     {
         return new Result(true, "tested via RequestTest::setHeaders");
     }
-        
-
 }
