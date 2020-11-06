@@ -10,7 +10,6 @@ use Lucinda\URL\Connection\Single as Connection;
 class Response
 {
     private const COVERED_OPTIONS = [
-        CURLINFO_COOKIELIST=>"setCookies",
         CURLINFO_TOTAL_TIME=>"setDuration",
         CURLINFO_RESPONSE_CODE=>"setStatusCode",
         CURLINFO_EFFECTIVE_URL=>"setURL"

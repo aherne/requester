@@ -6,8 +6,6 @@ use Lucinda\URL\Request\ShareType;
 
 /**
  * Encapsulates a shared request, able to exchange cookies and session between multiple Request instances
- *
- * TODO: investigate curl_share_strerror && curl_share_errno
  */
 class SharedRequest
 {
