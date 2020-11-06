@@ -1,5 +1,19 @@
 # Lucinda URL Requester
 
+Table of contents:
+
+- [About](#about)
+- [Running Single Requests](#running-single-requests)
+    - [File Uploading](#file-uploading)
+    - [File Downloading](#file-downloading)
+- [Running Multiple Asynchronous Requests](#running-multiple-asynchronous-requests)
+- [Running Cookie Sharing Synchronous Requests](#running-multiple-cookie-sharing-synchronous-requests)
+    - [Working With HTTP Cookies](#working-with-http-cookies)
+- [Working With Responses](#working-with-responses)
+- [Error Handling](#error-handling)
+
+## About
+
 This API is a light weight cURL wrapper aimed at completely hiding chaotic native library underneath through a full featured OOP layer that is easy and logical to work with. It is built as an antithesis of Guzzle, the "industry standard" today, by being:
 
 - **self-reliant**: unlike Guzzle, which has no less than 40 dependencies, it depends only on 1 library for unit testing
@@ -100,7 +114,7 @@ This executes two requests simultaneously using HTTP2 pipelining and receives a 
 
 | Method | Arguments | Returns | Description |
 | --- | --- | --- | --- |
-| __construct | int $pipeliningOption = Pipelining::HTTP1_HTTP2 | void | Initiates a multi URL connection based on one of [Lucinda\URL\Request\Pipelining](https://github.com/aherne/requester/blob/master/src/Request/Pipelining.php) enum values |
+| __construct | int $pipeliningOption = [Pipelining](https://github.com/aherne/requester/blob/master/src/Request/Pipelining.php)::HTTP1_HTTP2 | void | Initiates a multi URL connection based on one of [Lucinda\URL\Request\Pipelining](https://github.com/aherne/requester/blob/master/src/Request/Pipelining.php) enum values |
 | add | Request $request | void | Adds request to execution pool. |
 | setCustomOption | int $curlMultiOpt,<br/>mixed $value | void | Sets a custom CURLMOPT_* request option not covered by API already.<br/><small>Throws [Lucinda\URL\RequestException](https://github.com/aherne/requester/blob/master/src/RequestException.php) if option is already covered |
 | execute | bool $returnTransfer = true,<br/>int $maxRedirectionsAllowed = 0,<br/>int $timeout = 300000 | [Lucinda\URL\Response](https://github.com/aherne/requester/blob/master/src/Response.php)[] | Validates requests in pool then executes them asynchronously in order to produce responses.<br/><small>Throws [Lucinda\URL\RequestException](https://github.com/aherne/requester/blob/master/src/RequestException.php) if invalid request options combination was found.<br/>Throws [Lucinda\URL\ResponseException](https://github.com/aherne/requester/blob/master/src/ResponseException.php) if response retrieval failed (eg: response exceeded timeout).</small> |
@@ -112,7 +126,7 @@ Unlike native curl_multi, responses will be received in the order requests were 
 - *HTTP2*: attempts to multiplex the new transfer over an existing connection if HTTP/2
 - *HTTP1_HTTP2*: attempts pipelining and multiplexing independently of each other
 
-## Running multiple cookie/dns-sharing synchronous requests
+## Running cookie sharing synchronous requests
 
 To make multiple requests share cookies/dns, it is as simple as:
 
@@ -130,7 +144,7 @@ This very poorly documented feature makes 2nd request able to see cookies in fir
 
 | Method | Arguments | Returns | Description |
 | --- | --- | --- | --- |
-| __construct | int $shareOption = ShareType::COOKIES | void | Initiates a shared URL connection based on one of [Lucinda\URL\Request\ShareType](https://github.com/aherne/requester/blob/master/src/Request/ShareType.php) enum values |
+| __construct | int $shareOption = [ShareType](https://github.com/aherne/requester/blob/master/src/Request/ShareType.php)::COOKIES | void | Initiates a shared URL connection based on one of [Lucinda\URL\Request\ShareType](https://github.com/aherne/requester/blob/master/src/Request/ShareType.php) enum values |
 | add | Request $request | void | Adds request to share pool. |
 
 Unlike the other two classes of running requests, each request must be executed manually in order to produce a response! Cookie sharing will be performed depending on share type option (see constructor):
@@ -139,7 +153,7 @@ Unlike the other two classes of running requests, each request must be executed 
 - *DNS*: connections will share cached DNS hosts
 - *SSL_SESSION*: connections will share SSL session IDs
 
-## Working with HTTP cookies
+### Working with HTTP cookies
 
 API comes with a number of classes for working with cookies, whose area is IN BETWEEN requests and responses:
 
@@ -171,7 +185,7 @@ All this information can be queried via following public methods:
 | getHeaders | void | string[string] | Gets response headers by name and value |
 | getCustomOption | int $curlinfo | mixed | Gets value of a custom CURLINFO_* response option not covered by API already.<br/><small>Throws [Lucinda\URL\ResponseException](https://github.com/aherne/requester/blob/master/src/ResponseException.php) if option is already covered</small> |
 
-## Exception handling
+## Error handling
 
 Following exceptions may be thrown during request-response process by this API:
 
@@ -181,5 +195,5 @@ Following exceptions may be thrown during request-response process by this API:
 
 A few observations:
 
-- API has **no support for curl_share_*err* errors**, for whom there is zero documentation in both PHP cURL documentation as well as the C library it wraps
+- **No support for curl_share_*err* errors**, for whom there is zero documentation in both PHP cURL documentation as well as the C library it wraps
 - **As long as response is received for a request, no exception is thrown!** API does not consider statuses such as 404 or 500 to be errors by default, so it is up to developers to decide how to handle them
