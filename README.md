@@ -7,7 +7,7 @@ Table of contents:
     - [File Uploading](#file-uploading)
     - [File Downloading](#file-downloading)
 - [Running Multiple Asynchronous Requests](#running-multiple-asynchronous-requests)
-- [Running Cookie Sharing Synchronous Requests](#running-multiple-cookie-sharing-synchronous-requests)
+- [Running Cookie Sharing Synchronous Requests](#running-cookie-sharing-synchronous-requests)
     - [Working With HTTP Cookies](#working-with-http-cookies)
 - [Working With Responses](#working-with-responses)
 - [Error Handling](#error-handling)
