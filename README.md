@@ -1,4 +1,4 @@
-# Lucinda URL Requester
+ Lucinda URL Requester
 
 Table of contents:
 
@@ -20,7 +20,7 @@ This API is a light weight cURL wrapper aimed at completely hiding chaotic nativ
 - **very simple**: each class is designed to cover an aspect of a URL request and response processing, but only a limited number are relevant for developers
 - **very fast**: all code inside is developed on "less is more" paradigm: no over abstraction, no line of code more than strictly needed
 
-Library is 99% unit tested (some areas of cURL functionality have zero documentation), PSR-4 autoload compliant and only requiring PHP7.1+ interpreter. For installation you just need to write this in console:
+Library is 99% unit tested (some areas of cURL functionality have zero documentation), fully PSR-4 compliant, only requiring PHP7.1+ interpreter and cURL extension. For installation you just need to write this in console:
 
 ```console
 composer require lucinda/requester
@@ -41,7 +41,7 @@ Each of above classes branches through its methods to deeper classes that become
 Performing a single HTTPs request is as simple as this:
 
 ```php
-$request = new [Lucinda\URL\Request](https://github.com/aherne/requester/blob/master/src/Request.php)("https://www.lucinda-framework.com");
+$request = new Lucinda\URL\Request("https://www.lucinda-framework.com");
 $response = $request->execute();
 ```
 
@@ -74,8 +74,8 @@ API comes with [Lucinda\URL\Request](https://github.com/aherne/requester/blob/ma
 Example (uploads LOCAL_FILE_PATH to REMOTE_FILE_PATH):
 
 ```php
-$request = new [Lucinda\URL\FileUpload](https://github.com/aherne/requester/blob/master/src/FileUpload.php)(REMOTE_FILE_PATH);
-$request->setMethod([Lucinda\URL\Request\Method](https://github.com/aherne/requester/blob/master/src/Request/Method.php)::PUT);
+$request = new Lucinda\URL\FileUpload(REMOTE_FILE_PATH);
+$request->setMethod(Lucinda\URL\Request\Method::PUT);
 $request->setFile(LOCAL_FILE_PATH);
 $request->execute();
 ```
@@ -93,8 +93,8 @@ API comes with [Lucinda\URL\Request](https://github.com/aherne/requester/blob/ma
 Example (downloads REMOTE_FILE_PATH into LOCAL_FILE_PATH):
 
 ```php
-$request = new [Lucinda\URL\FileDownload](https://github.com/aherne/requester/blob/master/src/FileDownload.php)(REMOTE_FILE_PATH);
-$request->setMethod([Lucinda\URL\Request\Method](https://github.com/aherne/requester/blob/master/src/Request/Method.php)::GET);
+$request = new Lucinda\URL\FileDownload(REMOTE_FILE_PATH);
+$request->setMethod(Lucinda\URL\Request\Method::GET);
 $request->setFile(LOCAL_FILE_PATH);
 $request->execute();
 ```
@@ -104,9 +104,9 @@ $request->execute();
 Performing multiple requests at once it is no less simple:
 
 ```php
-$multiRequest = new [Lucinda\URL\MultiRequest](https://github.com/aherne/requester/blob/master/src/MultiRequest.php)(Pipelining::HTTP2);
-$multiRequest->add(new Request("https://www.lucinda-framework.com/news"));
-$multiRequest->add(new Request("https://www.lucinda-framework.com/tutorials"));
+$multiRequest = new Lucinda\URL\MultiRequest(Lucinda\URL\Request\Pipelining::HTTP2);
+$multiRequest->add(new Lucinda\URL\Request("https://www.lucinda-framework.com/news"));
+$multiRequest->add(new Lucinda\URL\Request("https://www.lucinda-framework.com/tutorials"));
 $responses = $multiRequest->execute();
 ```
 
@@ -131,10 +131,10 @@ Unlike native curl_multi, responses will be received in the order requests were 
 To make multiple requests share cookies/dns, it is as simple as:
 
 ```php
-$sharedRequest = new [Lucinda\URL\SharedRequest](https://github.com/aherne/requester/blob/master/src/SharedRequest.php)(ShareType::COOKIE);
-$request1 = new Request("http://www.example.com/page1");
+$sharedRequest = new Lucinda\URL\SharedRequest(Lucinda\URL\Request\ShareType::COOKIE);
+$request1 = new Lucinda\URL\Request("http://www.example.com/page1");
 $multiRequest->add($request1);
-$request2 = new Request("http://www.example.com/page1");
+$request2 = new Lucinda\URL\Request("http://www.example.com/page1");
 $multiRequest->add($request2);
 $response1 = $request1->execute();
 $response2 = $request2->execute();
