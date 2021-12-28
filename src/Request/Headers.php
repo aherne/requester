@@ -18,11 +18,6 @@ class Headers
         "cookie"=>"setCookie",
     ];
     
-    private $ifModifiedSince;
-    private $ifUnmodifiedSince;
-    private $userAgent;
-    private $referer;
-    private $oauth2Bearer;
     private $customHeaders = [];
     
     private $connection;

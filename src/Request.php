@@ -16,7 +16,7 @@ use Lucinda\URL\Request\Parameters;
  */
 class Request
 {
-    private const COVERED_OPTIONS = [
+    protected const COVERED_OPTIONS = [
         CURLOPT_URL=>"setURL",
         CURLOPT_POST=>"setMethod",
         CURLOPT_NOBODY=>"setMethod",
@@ -219,7 +219,7 @@ class Request
     /**
      * Validates request then executes it in order to produce a response
      *
-     * @param int $returnTransfer Whether or not response body should be returned
+     * @param bool $returnTransfer Whether or not response body should be returned
      * @param int $maxRedirectionsAllowed Maximum number of redirections allowed (if zero, it means none are)
      * @param int $timeout Connection timeout in milliseconds
      * @throws ResponseException If execution failed

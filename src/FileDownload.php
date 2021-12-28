@@ -101,7 +101,11 @@ class FileDownload extends Request
         // sets connection timeout
         $this->connection->set(CURLOPT_CONNECTTIMEOUT_MS, $timeout);
     }
-    
+
+    /**
+     * {@inheritDoc}
+     * @see \Lucinda\URL\Request::execute()
+     */
     public function execute(bool $returnTransfer = true, int $maxRedirectionsAllowed = 0, int $timeout = 300000): Response
     {
         $response = parent::execute($returnTransfer, $maxRedirectionsAllowed, $timeout);

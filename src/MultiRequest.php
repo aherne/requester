@@ -59,7 +59,7 @@ class MultiRequest
     /**
      * Validates requests then executes them asynchronously in order to produce responses
      *
-     * @param int $returnTransfer Whether or not response body should be returned for each request
+     * @param bool $returnTransfer Whether or not response body should be returned for each request
      * @param int $maxRedirectionsAllowed Maximum number of redirections allowed (if zero, it means none are) for each request
      * @param int $timeout Connection timeout in milliseconds for each request
      * @throws ResponseException If execution failed
