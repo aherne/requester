@@ -8,7 +8,7 @@ use Lucinda\UnitTest\Result;
 class MultiRequestTest
 {
     const URLS_TESTED = [
-        "https://www.lucinda-framework.com/tutorials/project-structure",
+        "https://www.lucinda-framework.com/tutorials/application",
         "https://www.lucinda-framework.com/tutorials/mvc",
         "https://www.lucinda-framework.com/tutorials/event-listeners"
     ];

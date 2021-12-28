@@ -6,7 +6,7 @@ namespace Lucinda\URL\Connection;
  */
 class Shared
 {
-    private $connection;
+    private \CurlShareHandle $connection;
     
     /**
      * Initiates a shared URL connection
@@ -35,12 +35,12 @@ class Shared
     }
     
     /**
-     * Sets multi-connection option
+     * Sets cookie share option
      *
      * @param int $option CURLSHOPT_* constant
-     * @param mixed $value
+     * @param int $value
      */
-    public function set(int $option, $value): void
+    public function set(int $option, int $value): void
     {
         \curl_share_setopt($this->connection, $option, $value);
     }

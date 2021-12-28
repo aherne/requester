@@ -1,0 +1,4 @@
+IMPLEMENT:
+    https://www.php.net/manual/en/function.curl-copy-handle.php
+FIX:
+    SharedRequest.php

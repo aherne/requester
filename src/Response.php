@@ -15,13 +15,13 @@ class Response
         CURLINFO_EFFECTIVE_URL=>"setURL"
     ];
     
-    private $connection;
+    private Connection $connection;
     
-    private $url;
-    private $duration;
-    private $responseCode;
-    private $body;
-    private $headers;
+    private string $url;
+    private int $duration;
+    private int $responseCode;
+    private string $body;
+    private array $headers;
     
     /**
      * Sets basic information, response body and headers
@@ -63,12 +63,12 @@ class Response
      */
     private function setDuration(float $duration): void
     {
-        if ($duration===0) {
+        if ($duration==0) {
             $this->duration = round($duration*1000);
         } elseif (defined("CURLINFO_TOTAL_TIME_T")) {
             $this->duration = round($this->connection->get(CURLINFO_TOTAL_TIME_T)/1000);
         } else {
-            $this->duration = $this->connection->get(CURLINFO_TOTAL_TIME)*1000;
+            $this->duration = round($this->connection->get(CURLINFO_TOTAL_TIME)*1000);
         }
     }
     

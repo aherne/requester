@@ -17,15 +17,9 @@ class Headers
         "referer"=>"setReferer",
         "cookie"=>"setCookie",
     ];
-    
-    private $ifModifiedSince;
-    private $ifUnmodifiedSince;
-    private $userAgent;
-    private $referer;
-    private $oauth2Bearer;
-    private $customHeaders = [];
-    
-    private $connection;
+
+    private array $customHeaders = [];
+    private Connection $connection;
     
     /**
      * Sets connection to perform operations on.
@@ -72,7 +66,7 @@ class Headers
     /**
      * Compiles an Referer header based on argument received
      *
-     * @param string $userAgent
+     * @param string $referer
      */
     public function setReferer(string $referer): void
     {

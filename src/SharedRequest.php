@@ -9,17 +9,17 @@ use Lucinda\URL\Request\ShareType;
  */
 class SharedRequest
 {
-    private $connection;
+    private SharedConnection $connection;
     
     /**
      * Initiates a shared URL connection based on one of ShareType enum values
      *
-     * @param ShareType $share One of enum values (eg: ShareType::COOKIES)
+     * @param ShareType $type One of enum values (eg: ShareType::COOKIES)
      */
-    public function __construct(int $type = ShareType::COOKIES)
+    public function __construct(ShareType $type = ShareType::COOKIES)
     {
         $this->connection = new SharedConnection();
-        $this->connection->set(CURLSHOPT_SHARE, $type);
+        $this->connection->set(CURLSHOPT_SHARE, $type->value);
     }
     
     /**

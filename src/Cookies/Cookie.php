@@ -6,14 +6,14 @@ namespace Lucinda\URL\Cookies;
  */
 class Cookie
 {
-    private $name;
-    private $value;
-    private $maxAge = 0;
-    private $path = "/";
-    private $domain;
-    private $includeSubdomains = false;
-    private $isSecuredByHTTPS = false;
-    private $isSecuredByHTTPheaders = false;
+    private string $name;
+    private string $value;
+    private int $maxAge = 0;
+    private string $path = "/";
+    private string $domain = "";
+    private bool $includeSubdomains = false;
+    private bool $isSecuredByHTTPS = false;
+    private bool $isSecuredByHTTPheaders = false;
     
     /**
      * Sets up cookie by name and value
@@ -90,7 +90,7 @@ class Cookie
     }
     
     /**
-     * Gets whether or not subdomains should be available for cookie
+     * Gets whether subdomains should be available for cookie
      *
      * @return bool
      */
@@ -120,7 +120,7 @@ class Cookie
     }
     
     /**
-     * Sets whether or not cookies are available only if protocol is HTTPS
+     * Sets whether cookies are available only if protocol is HTTPS
      */
     public function setSecuredByHTTPS(): void
     {
@@ -128,7 +128,7 @@ class Cookie
     }
     
     /**
-     * Gets whether or not cookies are available only if protocol is HTTPS
+     * Gets whether cookies are available only if protocol is HTTPS
      *
      * @return bool
      */
@@ -138,7 +138,7 @@ class Cookie
     }
     
     /**
-     * Sets whether or not cookies are not available to client via JavaScript
+     * Sets whether cookies are not available to client via JavaScript
      */
     public function setSecuredByHTTPheaders(): void
     {
@@ -146,7 +146,7 @@ class Cookie
     }
     
     /**
-     * Gets whether or not cookies are not available to client via JavaScript
+     * Gets whether cookies are not available to client via JavaScript
      *
      * @return bool
      */

@@ -4,10 +4,10 @@ namespace Lucinda\URL\Request;
 /**
  * Enum encapsulating pipelining options to use in multi-requests
  */
-interface Pipelining
+enum Pipelining: int
 {
-    const DISABLED = 0;
-    const HTTP1 = CURLPIPE_HTTP1;
-    const HTTP2 = CURLPIPE_MULTIPLEX;
-    const HTTP1_HTTP2 = 3;
+    case DISABLED = 0;
+    case HTTP1 = 1; // CURLPIPE_HTTP1
+    case HTTP2 = 2; // CURLPIPE_MULTIPLEX
+    case HTTP1_HTTP2 = 3; // CURLPIPE_HTTP1_HTTP2
 }

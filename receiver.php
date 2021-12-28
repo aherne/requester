@@ -4,6 +4,7 @@ header("Content-Type: application/json");
 if (!empty($_GET["newcookie"])) {
     setcookie("hello", "world", time()+3600, "/");
 }
+file_put_contents("test.json", json_encode($_SERVER));
 if ($_SERVER["REQUEST_METHOD"]=="PUT") {
     $input = file_get_contents("php://input");
     file_put_contents(__DIR__."/upload.json", $input);

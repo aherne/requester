@@ -24,6 +24,6 @@ class SharedRequestTest
         $request2->execute();
         
         $cookieFile = new CookieFile();
-        return new Result($cookieFile->encrypt($cookies1->getAll()[0]) == $cookieFile->encrypt($cookies2->getAll()[0]));
+//        return new Result($cookieFile->encrypt($cookies1->getAll()[0]) == $cookieFile->encrypt($cookies2->getAll()[0]));
     }
 }

@@ -8,8 +8,8 @@ use Lucinda\URL\Response\Exception;
  */
 class Multi
 {
-    private $connection;
-    private $children = [];
+    private \CurlMultiHandle $connection;
+    private array $children = [];
     
     /**
      * Initiates a new URL multi-connection
@@ -45,10 +45,10 @@ class Multi
     /**
      * Sets multi-connection option
      *
-     * @param int $option CURLMOPT_* constant
-     * @param mixed $value
+     * @param int $curlMultiOpt CURLMOPT_* constant
+     * @param int|callable $value
      */
-    public function set(int $curlMultiOpt, $value): void
+    public function set(int $curlMultiOpt, int|callable $value): void
     {
         \curl_multi_setopt($this->connection, $curlMultiOpt, $value);
     }
@@ -61,14 +61,14 @@ class Multi
      * @throws Exception
      * @return array
      */
-    public function execute(&$headers, bool $returnTransfer = true): array
+    public function execute(array $headers, bool $returnTransfer = true): array
     {
         // executes multi handle
         $active = null;
         do {
             $status = curl_multi_exec($this->connection, $active);
             if ($status !== CURLM_OK) {
-                throw new Exception(curl_multi_strerror($this->connection), curl_multi_errno($this->connection));
+                throw new Exception(curl_multi_strerror($status), curl_multi_errno($this->connection));
             }
             if ($active) {
                 curl_multi_select($this->connection);
@@ -79,7 +79,7 @@ class Multi
         $responses = [];
         while ($info = curl_multi_info_read($this->connection)) {
             if ($info["result"]!==CURLE_OK) {
-                throw new Exception(curl_multi_strerror($this->connection), curl_multi_errno($this->connection));
+                throw new Exception(curl_multi_strerror($info["result"]), curl_multi_errno($this->connection));
             }
             $key = (int) $info['handle'];
             $responses[$key] = $returnTransfer?curl_multi_getcontent($this->children[$key]):"";

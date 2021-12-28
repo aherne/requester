@@ -8,7 +8,7 @@ use Lucinda\URL\Response\Exception;
  */
 class Single
 {
-    protected $connection;
+    protected \CurlHandle $connection;
     
     /**
      * Initiates a new URL connection
@@ -30,9 +30,9 @@ class Single
      * Sets connection option
      *
      * @param int $option CURLOPT_* constant
-     * @param mixed $value
+     * @param bool|int|string|callable|resource $value
      */
-    public function set(int $option, $value): void
+    public function set(int $option, mixed $value): void
     {
         \curl_setopt($this->connection, $option, $value);
     }
@@ -43,7 +43,7 @@ class Single
      * @param int $option CURLINFO_* constant
      * @return mixed
      */
-    public function get(int $option)
+    public function get(int $option): mixed
     {
         return \curl_getinfo($this->connection, $option);
     }
@@ -53,9 +53,9 @@ class Single
      *
      * @param string $path
      * @param string $name
-     * @return mixed
+     * @return \CURLFile
      */
-    public function createFile(string $path, string $name = "")
+    public function createFile(string $path, string $name = ""): \CURLFile
     {
         return \curl_file_create($path, \mime_content_type($path), $name);
     }
@@ -64,9 +64,9 @@ class Single
      * Executes request and returns response body
      *
      * @throws Exception
-     * @return mixed
+     * @return string|bool
      */
-    public function execute()
+    public function execute(): string|bool
     {
         $body = curl_exec($this->connection);
         if ($body===false) {
@@ -78,9 +78,9 @@ class Single
     /**
      * (ONLY FOR INTERNAL USAGE!) Gets curl driver underneath. Necessary only for multiconnections!
      *
-     * @return resource
+     * @return \CurlHandle
      */
-    public function getDriver()
+    public function getDriver(): \CurlHandle
     {
         return $this->connection;
     }

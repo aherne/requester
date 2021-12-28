@@ -4,15 +4,15 @@ namespace Lucinda\URL\Request;
 /**
  * Enum encapsulating HTTP request methods
  */
-interface Method
+enum Method : string
 {
-    const GET = "GET";
-    const POST = "POST";
-    const PUT = "PUT";
-    const DELETE = "DELETE";
-    const HEAD = "HEAD";
-    const OPTIONS = "OPTIONS";
-    const CONNECT = "CONNECT";
-    const TRACE = "TRACE";
-    const PATCH = "PATCH";
+    case GET = "GET";
+    case POST = "POST";
+    case PUT = "PUT";
+    case DELETE = "DELETE";
+    case HEAD = "HEAD";
+    case OPTIONS = "OPTIONS";
+    case CONNECT = "CONNECT";
+    case TRACE = "TRACE";
+    case PATCH = "PATCH";
 }

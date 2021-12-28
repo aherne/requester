@@ -17,15 +17,16 @@ class FileDownload extends Request
         CURLOPT_PROGRESSFUNCTION=>"setProgressHandler"
     ];
     private $fileHandle;
-        
+
     /**
      * {@inheritDoc}
+     * @throws RequestException
      * @see \Lucinda\URL\Request::setMethod()
      */
-    public function setMethod(string $method): void
+    public function setMethod(Method $method): void
     {
         if ($method != Method::GET) {
-            throw new RequestException("Unsupported request method: ".$method);
+            throw new RequestException("Unsupported request method: ".$method->value);
         }
         $this->method = $method;
     }
@@ -89,10 +90,10 @@ class FileDownload extends Request
         }
         
         // validate SSL and sets certificate if missing
-        if (strpos($this->url, "https")!==0 && $this->isSSL) {
+        if (!str_starts_with($this->url, "https") && $this->isSSL) {
             throw new RequestException("URL requested doesn't require SSL!");
         }
-        if (strpos($this->url, "https")===0 && !$this->isSSL) {
+        if (str_starts_with($this->url, "https") && !$this->isSSL) {
             $this->setSSL(dirname(__DIR__).DIRECTORY_SEPARATOR."certificates".DIRECTORY_SEPARATOR."cacert.pem");
         }
         
@@ -101,7 +102,11 @@ class FileDownload extends Request
         // sets connection timeout
         $this->connection->set(CURLOPT_CONNECTTIMEOUT_MS, $timeout);
     }
-    
+
+    /**
+     * {@inheritDoc}
+     * @see \Lucinda\URL\Request::execute()
+     */
     public function execute(bool $returnTransfer = true, int $maxRedirectionsAllowed = 0, int $timeout = 300000): Response
     {
         $response = parent::execute($returnTransfer, $maxRedirectionsAllowed, $timeout);

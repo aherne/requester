@@ -9,7 +9,7 @@ use Lucinda\URL\Connection\Single as Connection;
  */
 class SSL
 {
-    private $connection;
+    private Connection $connection;
     
     /**
      * Sets connection to perform operations on as well as file holding public PEM certificate.

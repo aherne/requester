@@ -10,7 +10,7 @@ use Lucinda\URL\Cookies\CookieFile;
  */
 class Cookies
 {
-    private $connection;
+    private Connection $connection;
     
     /**
      * Sets connection to perform operations on.

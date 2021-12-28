@@ -9,14 +9,14 @@ use Lucinda\URL\Connection\Single as Connection;
  */
 class Parameters
 {
-    private $parameters = [];
-    private $connection;
+    private array $parameters = [];
+    private Connection $connection;
     
     /**
      * Sets connection to perform operations on. Optionally includes key-value set of POST parameters to add already.
      *
-     * @param resource $curl
      * @param Connection $connection
+     * @param array $parameters
      */
     public function __construct(Connection $connection, array $parameters = [])
     {
@@ -31,9 +31,9 @@ class Parameters
      * Adds a POST parameter by key and value (to be accessible as $_POST in response)
      *
      * @param string $key
-     * @param mixed $value
+     * @param int|string|array $value
      */
-    public function add(string $key, $value): void
+    public function add(string $key, int|string|array $value): void
     {
         $this->parameters[$key] = $value;
         $this->connection->set(CURLOPT_POSTFIELDS, $this->parameters);

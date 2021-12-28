@@ -32,12 +32,13 @@ class FileUpload extends Request
             fclose($this->fileHandle);
         }
     }
-    
+
     /**
      * {@inheritDoc}
+     * @throws RequestException
      * @see \Lucinda\URL\Request::setMethod()
      */
-    public function setMethod(string $method): void
+    public function setMethod(Method $method): void
     {
         switch ($method) {
             case Method::POST:
@@ -47,7 +48,7 @@ class FileUpload extends Request
                 $this->connection->set(CURLOPT_PUT, true);
                 break;
             default:
-                throw new RequestException("Unsupported request method: ".$method);
+                throw new RequestException("Unsupported request method: ".$method->value);
                 break;
         }
         $this->method = $method;
@@ -68,9 +69,10 @@ class FileUpload extends Request
         $this->connection->set(CURLOPT_INFILE, $this->fileHandle);
         $this->connection->set(CURLOPT_INFILESIZE, filesize($path));
     }
-    
+
     /**
      * {@inheritDoc}
+     * @throws RequestException
      * @see \Lucinda\URL\Request::setParameters()
      */
     public function setParameters(array $parameters = []): Parameters

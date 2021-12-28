@@ -11,8 +11,8 @@ use Lucinda\URL\Connection\Multi;
  */
 class MultiRequest
 {
-    private $connection;
-    private $children = [];
+    private Multi $connection;
+    private array $children = [];
     
     /**
      * Initiates a multi URL connection based on piplining options:
@@ -23,10 +23,10 @@ class MultiRequest
      *
      * @param Pipelining $pipeliningOption One of enum values (eg: Pipelining::HTTP2)
      */
-    public function __construct(int $pipeliningOption = Pipelining::HTTP1_HTTP2)
+    public function __construct(Pipelining $pipeliningOption = Pipelining::HTTP2)
     {
         $this->connection = new Multi();
-        $this->connection->set(CURLMOPT_PIPELINING, $pipeliningOption);
+        $this->connection->set(CURLMOPT_PIPELINING, $pipeliningOption->value);
     }
         
     /**
@@ -45,10 +45,10 @@ class MultiRequest
      * Sets obscure cURLm option not already covered by API.
      *
      * @param int $curlMultiOpt Curlmopt option key (eg: CURLMOPT_MAX_PIPELINE_LENGTH)
-     * @param mixed $value
+     * @param int|callable $value
      * @throws RequestException If HTTP method is invalid
      */
-    public function setCustomOption(int $curlMultiOpt, $value): void
+    public function setCustomOption(int $curlMultiOpt, int|callable $value): void
     {
         if ($curlMultiOpt==CURLMOPT_PIPELINING) {
             throw new RequestException("Option already covered by constructor!");
@@ -59,7 +59,7 @@ class MultiRequest
     /**
      * Validates requests then executes them asynchronously in order to produce responses
      *
-     * @param int $returnTransfer Whether or not response body should be returned for each request
+     * @param bool $returnTransfer Whether or not response body should be returned for each request
      * @param int $maxRedirectionsAllowed Maximum number of redirections allowed (if zero, it means none are) for each request
      * @param int $timeout Connection timeout in milliseconds for each request
      * @throws ResponseException If execution failed
@@ -86,6 +86,7 @@ class MultiRequest
         }
                 
         // executes multi-request and compiles responses
+        $responses = [];
         $bodies = $this->connection->execute($headers, $returnTransfer);
         foreach ($this->children as $key=>$request) {
             $connection = $request->getConnection();

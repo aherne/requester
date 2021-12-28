@@ -15,7 +15,7 @@ class FileUploadTest
     public function __construct()
     {
         $this->sourceFilePath = dirname(__DIR__).DIRECTORY_SEPARATOR."composer.json";
-        $this->destinationFilePath = dirname(__DIR__).DIRECTORY_SEPARATOR."upload.json";
+        $this->destinationFilePath = RECEIVER_FOLDER."/upload.json";
         $this->progressHandler = new FileTransferProgress();
         $this->object = new FileUpload(RECEIVER_HTTP);
     }

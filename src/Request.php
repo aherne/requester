@@ -16,7 +16,7 @@ use Lucinda\URL\Request\Parameters;
  */
 class Request
 {
-    private const COVERED_OPTIONS = [
+    protected const COVERED_OPTIONS = [
         CURLOPT_URL=>"setURL",
         CURLOPT_POST=>"setMethod",
         CURLOPT_NOBODY=>"setMethod",
@@ -46,17 +46,18 @@ class Request
         CURLOPT_CONNECTTIMEOUT_MS=>"prepare"
     ];
     
-    protected $url;
-    protected $method;
+    protected string $url = "";
+    protected Method $method = Method::GET;
     
-    protected $isSSL = false;
-    protected $isPOST = false;
-    protected $connection;
-    
+    protected bool $isSSL = false;
+    protected bool $isPOST = false;
+    protected Connection $connection;
+
     /**
      * Initiates a new URL connection or imports existing cURL handler
      *
      * @param ?string $url
+     * @throws RequestException
      */
     public function __construct(?string $url = null)
     {
@@ -85,9 +86,8 @@ class Request
      * Sets HTTP method to use in requesting resource. If not set, GET is used by default!
      *
      * @param Method $method One of enum values (eg: Method::POST)
-     * @throws RequestException If HTTP method is invalid
      */
-    public function setMethod(string $method): void
+    public function setMethod(Method $method): void
     {
         switch ($method) {
             case Method::GET:
@@ -105,10 +105,7 @@ class Request
             case Method::CONNECT:
             case Method::TRACE:
             case Method::PATCH:
-                $this->connection->set(CURLOPT_CUSTOMREQUEST, $method);
-                break;
-            default:
-                throw new RequestException("Invalid request method");
+                $this->connection->set(CURLOPT_CUSTOMREQUEST, $method->value);
                 break;
         }
         $this->method = $method;
@@ -135,12 +132,13 @@ class Request
     {
         return new Headers($this->connection);
     }
-    
+
     /**
      * Sets SQL policy through SSL object returned.
      *
      * @param string $certificateAuthorityBundlePath
      * @return SSL
+     * @throws FileNotFoundException
      */
     public function setSSL(string $certificateAuthorityBundlePath): SSL
     {
@@ -155,7 +153,7 @@ class Request
      * @param mixed $value
      * @throws RequestException If option already covered
      */
-    public function setCustomOption(int $curlopt, $value): void
+    public function setCustomOption(int $curlopt, mixed $value): void
     {
         if (isset(self::COVERED_OPTIONS[$curlopt])) {
             throw new RequestException("Option already covered by ".self::COVERED_OPTIONS[$curlopt]." method!");
@@ -176,7 +174,7 @@ class Request
     /**
      * Validates request and prepares it for being sent. Called already by "execute" method!
      *
-     * @throws RequestException If request information is insufficient/invalid.
+     * @throws RequestException|FileNotFoundException If request information is insufficient/invalid.
      */
     public function prepare(bool $returnTransfer = true, int $maxRedirectionsAllowed = 0, int $timeout = 300000): void
     {
@@ -194,10 +192,10 @@ class Request
         }
         
         // validate SSL and sets certificate if missing
-        if (strpos($this->url, "https")!==0 && $this->isSSL) {
+        if (!str_starts_with($this->url, "https") && $this->isSSL) {
             throw new RequestException("URL requested doesn't require SSL!");
         }
-        if (strpos($this->url, "https")===0 && !$this->isSSL) {
+        if (str_starts_with($this->url, "https") && !$this->isSSL) {
             $this->setSSL(dirname(__DIR__).DIRECTORY_SEPARATOR."certificates".DIRECTORY_SEPARATOR."cacert.pem");
         }
         
@@ -219,10 +217,10 @@ class Request
     /**
      * Validates request then executes it in order to produce a response
      *
-     * @param int $returnTransfer Whether or not response body should be returned
+     * @param bool $returnTransfer Whether response body should be returned
      * @param int $maxRedirectionsAllowed Maximum number of redirections allowed (if zero, it means none are)
      * @param int $timeout Connection timeout in milliseconds
-     * @throws ResponseException If execution failed
+     * @throws ResponseException|RequestException|FileNotFoundException If execution failed
      * @return Response
      */
     public function execute(bool $returnTransfer = true, int $maxRedirectionsAllowed = 0, int $timeout = 300000): Response
@@ -247,7 +245,7 @@ class Request
         
         // executes request
         $startTime = microtime(true);
-        $body = $this->connection->execute($this->connection);
+        $body = $this->connection->execute();
         $endTime = microtime(true);
         
         // split headers from body

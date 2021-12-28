@@ -56,11 +56,11 @@ class CookieHeader implements CookieParser
                 $cookie->setMaxAge((int) trim($matches[1]));
             }
             
-            if (strpos($options, "Secure")!==false) {
+            if (str_contains($options, "Secure")) {
                 $cookie->setSecuredByHTTPS();
             }
             
-            if (strpos($options, "HttpOnly")) {
+            if (str_contains($options, "HttpOnly")) {
                 $cookie->setSecuredByHTTPheaders();
             }
         }

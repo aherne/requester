@@ -13,7 +13,7 @@ class CookieFile implements CookieParser
     public function encrypt(Cookie $cookie): string
     {
         $options = [];
-        $options[] = ($cookie->getDomain()?$cookie->getDomain():"localhost").($cookie->getSecuredByHTTPheaders()?"#HttpOnly_":"");
+        $options[] = ($cookie->getDomain()??"localhost").($cookie->getSecuredByHTTPheaders()?"#HttpOnly_":"");
         $options[] = $cookie->getSubdomainsIncluded()?"TRUE":"FALSE";
         $options[] = $cookie->getPath();
         $options[] = $cookie->getSecuredByHTTPS()?"TRUE":"FALSE";
