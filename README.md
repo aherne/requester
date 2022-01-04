@@ -1,4 +1,4 @@
- Lucinda URL Requester
+# Lucinda URL Requester
 
 Table of contents:
 
@@ -10,6 +10,11 @@ Table of contents:
 - [Running Cookie Sharing Synchronous Requests](#running-cookie-sharing-synchronous-requests)
     - [Working With HTTP Cookies](#working-with-http-cookies)
 - [Working With Responses](#working-with-responses)
+- [Examples](#examples)
+  - [HTTP GET Request](#get-request)
+  - [HTTP POST Request](#post-request)
+  - [HTTP PUT Request](#put-request)
+  - [HTTP DELETE Request](#delete-request)
 - [Error Handling](#error-handling)
 
 ## About
@@ -185,6 +190,46 @@ All this information can be queried via following public methods:
 | getBody | void | string | Gets response body |
 | getHeaders | void | string[string] | Gets response headers by name and value |
 | getCustomOption | int $curlinfo | mixed | Gets value of a custom CURLINFO_* response option not covered by API already.<br/><small>Throws [Lucinda\URL\ResponseException](https://github.com/aherne/requester/blob/v2.0/src/ResponseException.php) if option is already covered</small> |
+
+## Examples
+
+### HTTP GET Request
+
+```php
+# any request that doesn't *setMethod* is considered GET by default
+$request = new Lucinda\URL\Request("https://www.example.com/?id=1");
+$response = $request->execute();
+```
+
+### HTTP POST Request
+
+```php
+# any POST request MUST *setParameters*
+$request = new Lucinda\URL\Request("https://www.example.com/add");
+$request->setMethod(\Lucinda\URL\Request\Method::POST);
+$request->setParameters(["asd"=>"fgh", "qwe"=>"rty"]);
+$response = $request->execute();
+```
+
+### HTTP PUT Request
+
+```php
+# any PUT request MUST *setParameters* AND stringify parameters
+$request = new Lucinda\URL\Request("https://www.example.com/edit");
+$request->setMethod(\Lucinda\URL\Request\Method::PUT);
+$request->setParameters(http_build_query(["id"=>1, "qwe"=>"tyu"]));
+$response = $request->execute();
+```
+
+### HTTP DELETE Request
+
+```php
+# any DELETE request MUST *setParameters* AND stringify parameters
+$request = new Lucinda\URL\Request("https://www.example.com/edit");
+$request->setMethod(\Lucinda\URL\Request\Method::DELETE);
+$request->setParameters(http_build_query(["id"=>1]));
+$response = $request->execute();
+```
 
 ## Error handling
 
