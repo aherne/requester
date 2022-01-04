@@ -214,20 +214,20 @@ $response = $request->execute();
 ### HTTP PUT Request
 
 ```php
-# any PUT request MUST *setParameters* AND stringify parameters
+# any PUT request MUST *setRaw* AND stringify parameters
 $request = new Lucinda\URL\Request("https://www.example.com/edit");
 $request->setMethod(\Lucinda\URL\Request\Method::PUT);
-$request->setParameters(http_build_query(["id"=>1, "qwe"=>"tyu"]));
+$request->setRaw(http_build_query(["id"=>1, "qwe"=>"tyu"]));
 $response = $request->execute();
 ```
 
 ### HTTP DELETE Request
 
 ```php
-# any DELETE request MUST *setParameters* AND stringify parameters
+# any DELETE request MUST *setRaw* AND stringify parameters
 $request = new Lucinda\URL\Request("https://www.example.com/delete");
 $request->setMethod(\Lucinda\URL\Request\Method::DELETE);
-$request->setParameters(http_build_query(["id"=>1]));
+$request->setRaw(http_build_query(["id"=>1]));
 $response = $request->execute();
 ```
 
