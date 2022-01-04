@@ -99,4 +99,11 @@ class FileDownloadTest
     {
         return new Result(true, "tested via Connection\MultiRequestTest or Connection\SharedRequestTest");
     }
+
+    public function setRaw()
+    {
+        return new Result(true, "method not applicable");
+    }
+        
+
 }

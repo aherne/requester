@@ -41,6 +41,16 @@ class FileDownload extends Request
         $this->fileHandle = fopen($path, "w+");
         $this->connection->set(CURLOPT_FILE, $this->fileHandle);
     }
+
+    /**
+     * Sets raw (binary) content to be uploaded using POST
+     *
+     * @param string $body
+     */
+    public function setRaw(string $body): void
+    {
+        // method not applicable
+    }
     
     /**
      * {@inheritDoc}

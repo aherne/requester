@@ -122,6 +122,17 @@ class Request
         $this->isPOST = true;
         return new Parameters($this->connection, $parameters);
     }
+
+    /**
+     * Sets raw (binary) content to be uploaded using POST
+     *
+     * @param string $body
+     */
+    public function setRaw(string $body): void
+    {
+        $this->isPOST = true;
+        $this->connection->set(CURLOPT_POSTFIELDS, $body);
+    }
     
     /**
      * Sets HTTP headers to send through Headers object returned.
@@ -187,7 +198,7 @@ class Request
         if ($this->method == Method::POST && !$this->isPOST) {
             throw new RequestException("No parameters to POST!");
         }
-        if ($this->method != Method::POST && $this->isPOST) {
+        if (!($this->method == Method::POST || $this->method == Method::PUT || $this->method == Method::DELETE) && $this->isPOST) {
             throw new RequestException("Parameters can't be used unless request method is POST");
         }
         
