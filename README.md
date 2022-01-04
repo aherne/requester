@@ -225,7 +225,7 @@ $response = $request->execute();
 
 ```php
 # any DELETE request MUST *setParameters* AND stringify parameters
-$request = new Lucinda\URL\Request("https://www.example.com/edit");
+$request = new Lucinda\URL\Request("https://www.example.com/delete");
 $request->setMethod(\Lucinda\URL\Request\Method::DELETE);
 $request->setParameters(http_build_query(["id"=>1]));
 $response = $request->execute();
