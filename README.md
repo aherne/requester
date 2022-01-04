@@ -11,10 +11,10 @@ Table of contents:
     - [Working With HTTP Cookies](#working-with-http-cookies)
 - [Working With Responses](#working-with-responses)
 - [Examples](#examples)
-  - [HTTP GET Request](#get-request)
-  - [HTTP POST Request](#post-request)
-  - [HTTP PUT Request](#put-request)
-  - [HTTP DELETE Request](#delete-request)
+  - [HTTP GET Request](#http-get-request)
+  - [HTTP POST Request](#http-post-request)
+  - [HTTP PUT Request](#http-put-request)
+  - [HTTP DELETE Request](#http-delete-request)
 - [Error Handling](#error-handling)
 
 ## About
