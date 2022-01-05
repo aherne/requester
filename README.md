@@ -10,6 +10,11 @@ Table of contents:
 - [Running Cookie Sharing Synchronous Requests](#running-cookie-sharing-synchronous-requests)
     - [Working With HTTP Cookies](#working-with-http-cookies)
 - [Working With Responses](#working-with-responses)
+- [Examples](#examples)
+  - [HTTP GET Request](#http-get-request)
+  - [HTTP POST Request](#http-post-request)
+  - [HTTP PUT Request](#http-put-request)
+  - [HTTP DELETE Request](#http-delete-request)
 - [Error Handling](#error-handling)
 
 ## About
@@ -184,6 +189,46 @@ All this information can be queried via following public methods:
 | getBody | void | string | Gets response body |
 | getHeaders | void | string[string] | Gets response headers by name and value |
 | getCustomOption | int $curlinfo | mixed | Gets value of a custom CURLINFO_* response option not covered by API already.<br/><small>Throws [Lucinda\URL\ResponseException](https://github.com/aherne/requester/blob/master/src/ResponseException.php) if option is already covered</small> |
+
+## Examples
+
+### HTTP GET Request
+
+```php
+# any request that doesn't *setMethod* is considered GET by default
+$request = new Lucinda\URL\Request("https://www.example.com/?id=1");
+$response = $request->execute();
+```
+
+### HTTP POST Request
+
+```php
+# any POST request MUST *setParameters*
+$request = new Lucinda\URL\Request("https://www.example.com/add");
+$request->setMethod(\Lucinda\URL\Request\Method::POST);
+$request->setParameters(["asd"=>"fgh", "qwe"=>"rty"]);
+$response = $request->execute();
+```
+
+### HTTP PUT Request
+
+```php
+# any PUT request MUST *setRaw* AND stringify parameters
+$request = new Lucinda\URL\Request("https://www.example.com/edit");
+$request->setMethod(\Lucinda\URL\Request\Method::PUT);
+$request->setRaw(http_build_query(["id"=>1, "qwe"=>"tyu"]));
+$response = $request->execute();
+```
+
+### HTTP DELETE Request
+
+```php
+# any DELETE request MUST *setRaw* AND stringify parameters
+$request = new Lucinda\URL\Request("https://www.example.com/delete");
+$request->setMethod(\Lucinda\URL\Request\Method::DELETE);
+$request->setRaw(http_build_query(["id"=>1]));
+$response = $request->execute();
+```
 
 ## Error handling
 

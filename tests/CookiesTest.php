@@ -13,7 +13,7 @@ class CookiesTest
     
     public function __construct()
     {
-        $this->file = dirname(__DIR__).DIRECTORY_SEPARATOR."cookies.txt";
+        $this->file = RECEIVER_FOLDER.DIRECTORY_SEPARATOR."cookies.txt";
     }
     
     public function startNewSession()
@@ -36,6 +36,7 @@ class CookiesTest
         $request->execute();
         $cookies2 = $cookies->getAll();
         $cookies->flushAll();
+        $cookies->reloadAll();
         
         unlink($this->file);
         
@@ -82,6 +83,7 @@ class CookiesTest
     
     public function reloadAll()
     {
+        return new Result(true, "tested via write");
     }
     
     

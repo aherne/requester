@@ -79,17 +79,6 @@ class FileUpload extends Request
     }
     
     /**
-     * Sets raw (binary) content to be uploaded using POST
-     *
-     * @param string $body
-     */
-    public function setRaw(string $body): void
-    {
-        $this->isPOST = true;
-        $this->connection->set(CURLOPT_POSTFIELDS, $body);
-    }
-    
-    /**
      * {@inheritDoc}
      * @see \Lucinda\URL\Request::setCustomOption()
      */

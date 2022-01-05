@@ -14,7 +14,7 @@ class FileDownloadTest
     
     public function __construct()
     {
-        $this->filePath = dirname(__DIR__).DIRECTORY_SEPARATOR."download.json";
+        $this->filePath = RECEIVER_FOLDER.DIRECTORY_SEPARATOR."download.json";
         $this->progressHandler = new FileTransferProgress();
         $this->object = new FileDownload(RECEIVER_HTTP);
     }
@@ -99,4 +99,10 @@ class FileDownloadTest
     {
         return new Result(true, "tested via Connection\MultiRequestTest or Connection\SharedRequestTest");
     }
+    public function setRaw()
+    {
+        return new Result(true, "method not applicable");
+    }
+        
+
 }

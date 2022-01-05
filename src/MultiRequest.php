@@ -23,7 +23,7 @@ class MultiRequest
      *
      * @param Pipelining $pipeliningOption One of enum values (eg: Pipelining::HTTP2)
      */
-    public function __construct(int $pipeliningOption = Pipelining::HTTP1_HTTP2)
+    public function __construct(int $pipeliningOption = Pipelining::HTTP2)
     {
         $this->connection = new Multi();
         $this->connection->set(CURLMOPT_PIPELINING, $pipeliningOption);

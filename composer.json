@@ -13,7 +13,8 @@
     },
     "autoload": {
     	"psr-4": {
-        	"Lucinda\\URL\\": "src/"
+        	"Lucinda\\URL\\": "src/",
+            "Test\\Lucinda\\URL\\": "tests/"
     	}
     },
     "authors": [

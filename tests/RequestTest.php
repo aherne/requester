@@ -122,4 +122,16 @@ class RequestTest
         
         return $output;
     }
+    public function setRaw()
+    {
+        $parameters = ["a"=>"b", "c"=>"d"];
+        $request = new Request(RECEIVER_HTTP);
+        $request->setMethod(Method::PUT);
+        $request->setRaw(http_build_query($parameters));
+        $response = $request->execute();
+        $payload = json_decode($response->getBody(), true);
+        return new Result($payload["request"] == http_build_query($parameters));
+    }
+        
+
 }
