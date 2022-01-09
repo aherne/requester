@@ -33,13 +33,13 @@ composer require lucinda/requester
 
 Then use one of main classes provided:
 
-- [Lucinda\URL\Request](https://github.com/aherne/requester/blob/v2.0/src/Request.php): encapsulates a single HTTP/HTTPs request over cURL (covering curl_* functions)
-    - [Lucinda\URL\FileUpload](https://github.com/aherne/requester/blob/v2.0/src/FileUpload.php): specializes [Lucinda\URL\Request](https://github.com/aherne/requester/blob/v2.0/src/Request.php) for file upload
-    - [Lucinda\URL\FileDownload](https://github.com/aherne/requester/blob/v2.0/src/FileDownload.php): specializes [Lucinda\URL\Request](https://github.com/aherne/requester/blob/v2.0/src/Request.php) for file download
-- [Lucinda\URL\MultiRequest](https://github.com/aherne/requester/blob/v2.0/src/MultiRequest.php): encapsulates simultaneous multi HTTP/HTTPs requests over cURL (covering curl_multi_* functions)
-- [Lucinda\URL\SharedRequest](https://github.com/aherne/requester/blob/v2.0/src/SharedRequest.php): encapsulates multi HTTP/HTTPs requests able to share cookies/session over cURL (covering curl_share_* functions)
+- [Lucinda\URL\Request](https://github.com/aherne/requester/blob/master/src/Request.php): encapsulates a single HTTP/HTTPs request over cURL (covering curl_* functions)
+    - [Lucinda\URL\FileUpload](https://github.com/aherne/requester/blob/master/src/FileUpload.php): specializes [Lucinda\URL\Request](https://github.com/aherne/requester/blob/master/src/Request.php) for file upload
+    - [Lucinda\URL\FileDownload](https://github.com/aherne/requester/blob/master/src/FileDownload.php): specializes [Lucinda\URL\Request](https://github.com/aherne/requester/blob/master/src/Request.php) for file download
+- [Lucinda\URL\MultiRequest](https://github.com/aherne/requester/blob/master/src/MultiRequest.php): encapsulates simultaneous multi HTTP/HTTPs requests over cURL (covering curl_multi_* functions)
+- [Lucinda\URL\SharedRequest](https://github.com/aherne/requester/blob/master/src/SharedRequest.php): encapsulates multi HTTP/HTTPs requests able to share cookies/session over cURL (covering curl_share_* functions)
 
-Each of above classes branches through its methods to deeper classes that become relevant depending on the complexity of request. The end result of every request is a [Lucinda\URL\Response](https://github.com/aherne/requester/blob/v2.0/src/Response.php) object, encapsulating all response information (headers, body, status).
+Each of above classes branches through its methods to deeper classes that become relevant depending on the complexity of request. The end result of every request is a [Lucinda\URL\Response](https://github.com/aherne/requester/blob/master/src/Response.php) object, encapsulating all response information (headers, body, status).
 
 ## Running single requests
 
@@ -50,32 +50,32 @@ $request = new Lucinda\URL\Request("https://www.lucinda-framework.com");
 $response = $request->execute();
 ```
 
-This automatically sends target host embedded CAINFO certificate along with URL in order to establish a TLS connection then receives a [Lucinda\URL\Response](https://github.com/aherne/requester/blob/v2.0/src/Response.php) object. The class in charge of single requests is [Lucinda\URL\Request](https://github.com/aherne/requester/blob/v2.0/src/Request.php), defining following public methods:
+This automatically sends target host embedded CAINFO certificate along with URL in order to establish a TLS connection then receives a [Lucinda\URL\Response](https://github.com/aherne/requester/blob/master/src/Response.php) object. The class in charge of single requests is [Lucinda\URL\Request](https://github.com/aherne/requester/blob/master/src/Request.php), defining following public methods:
 
 | Method | Arguments | Returns | Description |
 | --- | --- | --- | --- |
 | __construct | ?string $url = null | void | Opens a cURL handle and optionally sets target URL |
-| setURL | string $url | void | Manually sets request URL<br/><small>Throws [Lucinda\URL\RequestException](https://github.com/aherne/requester/blob/v2.0/src/RequestException.php) if url is invalid</small> |
-| setMethod | [Lucinda\URL\Request\Method](https://github.com/aherne/requester/blob/v2.0/src/Request/Method.php) $method | void | Sets request method as one of [Lucinda\URL\Request\Method](https://github.com/aherne/requester/blob/v2.0/src/Request/Method.php) enum values otherwise assumes GET!<br/><small>Throws [Lucinda\URL\RequestException](https://github.com/aherne/requester/blob/v2.0/src/RequestException.php) if request method is invalid</small> |
-| setParameters | array $parameters = [] | [Lucinda\URL\Request\Parameters](https://github.com/aherne/requester/blob/v2.0/src/Request/Parameters.php) | Sets POST request parameters directly (by key and value) or delegates to specialized class. |
+| setURL | string $url | void | Manually sets request URL<br/><small>Throws [Lucinda\URL\RequestException](https://github.com/aherne/requester/blob/master/src/RequestException.php) if url is invalid</small> |
+| setMethod | [Lucinda\URL\Request\Method](https://github.com/aherne/requester/blob/master/src/Request/Method.php) $method | void | Sets request method as one of [Lucinda\URL\Request\Method](https://github.com/aherne/requester/blob/master/src/Request/Method.php) enum values otherwise assumes GET!<br/><small>Throws [Lucinda\URL\RequestException](https://github.com/aherne/requester/blob/master/src/RequestException.php) if request method is invalid</small> |
+| setParameters | array $parameters = [] | [Lucinda\URL\Request\Parameters](https://github.com/aherne/requester/blob/master/src/Request/Parameters.php) | Sets POST request parameters directly (by key and value) or delegates to specialized class. |
 | setRaw | string $body | void | Sets binary request parameters, available if request method is POST / GET / DELETE!<br/> |
-| setHeaders | void | [Lucinda\URL\Request\Headers](https://github.com/aherne/requester/blob/v2.0/src/Request/Headers.php) | Sets request headers by delegating to specialized class |
-| setSSL | string $certificateAuthorityBundlePath | [Lucinda\URL\Request\SSL](https://github.com/aherne/requester/blob/v2.0/src/Request/SSL.php) | Sets custom certificate authority bundle to use in SSL requests and delegates to specialized class.<br/><small>If not used, API will employ embedded **cacert.pem** file downloaded from [official site](https://curl.haxx.se/ca/cacert.pem)</small>! |
-| setCustomOption | int $curlopt,<br/>mixed $value | void | Sets a custom CURLOPT_* request option not covered by API already.<br/><small>Throws [Lucinda\URL\RequestException](https://github.com/aherne/requester/blob/v2.0/src/RequestException.php) if option is already covered.</small> |
-| execute | bool $returnTransfer = true,<br/>int $maxRedirectionsAllowed = 0,<br/>int $timeout = 300000 | [Lucinda\URL\Response](https://github.com/aherne/requester/blob/v2.0/src/Response.php) | Executes request and produces a response.<br/><small>Throws [Lucinda\URL\RequestException](https://github.com/aherne/requester/blob/v2.0/src/RequestException.php) if invalid request options combination was found.<br/>Throws [Lucinda\URL\ResponseException](https://github.com/aherne/requester/blob/v2.0/src/ResponseException.php) if response retrieval failed (eg: response exceeded timeout).</small> |
+| setHeaders | void | [Lucinda\URL\Request\Headers](https://github.com/aherne/requester/blob/master/src/Request/Headers.php) | Sets request headers by delegating to specialized class |
+| setSSL | string $certificateAuthorityBundlePath | [Lucinda\URL\Request\SSL](https://github.com/aherne/requester/blob/master/src/Request/SSL.php) | Sets custom certificate authority bundle to use in SSL requests and delegates to specialized class.<br/><small>If not used, API will employ embedded **cacert.pem** file downloaded from [official site](https://curl.haxx.se/ca/cacert.pem)</small>! |
+| setCustomOption | int $curlopt,<br/>mixed $value | void | Sets a custom CURLOPT_* request option not covered by API already.<br/><small>Throws [Lucinda\URL\RequestException](https://github.com/aherne/requester/blob/master/src/RequestException.php) if option is already covered.</small> |
+| execute | bool $returnTransfer = true,<br/>int $maxRedirectionsAllowed = 0,<br/>int $timeout = 300000 | [Lucinda\URL\Response](https://github.com/aherne/requester/blob/master/src/Response.php) | Executes request and produces a response.<br/><small>Throws [Lucinda\URL\RequestException](https://github.com/aherne/requester/blob/master/src/RequestException.php) if invalid request options combination was found.<br/>Throws [Lucinda\URL\ResponseException](https://github.com/aherne/requester/blob/master/src/ResponseException.php) if response retrieval failed (eg: response exceeded timeout).</small> |
 
 ### File Uploading
 
-API comes with [Lucinda\URL\Request](https://github.com/aherne/requester/blob/v2.0/src/Request.php) extensions specifically designed for file upload. To upload a file you must use [Lucinda\URL\FileUpload](https://github.com/aherne/requester/blob/v2.0/src/FileUpload.php), which comes with following additional public methods:
+API comes with [Lucinda\URL\Request](https://github.com/aherne/requester/blob/master/src/Request.php) extensions specifically designed for file upload. To upload a file you must use [Lucinda\URL\FileUpload](https://github.com/aherne/requester/blob/master/src/FileUpload.php), which comes with following additional public methods:
 
 | Method | Arguments | Returns | Description |
 | --- | --- | --- | --- |
 | __destruct | void | void | Closes file handles created by setFile method below |
-| setMethod | [Lucinda\URL\Request\Method](https://github.com/aherne/requester/blob/v2.0/src/Request/Method.php) $method | void | Specializes parent method to only allow POST and PUT requests |
-| setFile | string $path | void | Sets absolute location of file to upload, available if request method is PUT!<br/><small>Throws [Lucinda\URL\FileNotFoundException](https://github.com/aherne/requester/blob/v2.0/src/FileNotFoundException.php) if file isn't found.</small> |
+| setMethod | [Lucinda\URL\Request\Method](https://github.com/aherne/requester/blob/master/src/Request/Method.php) $method | void | Specializes parent method to only allow POST and PUT requests |
+| setFile | string $path | void | Sets absolute location of file to upload, available if request method is PUT!<br/><small>Throws [Lucinda\URL\FileNotFoundException](https://github.com/aherne/requester/blob/master/src/FileNotFoundException.php) if file isn't found.</small> |
 | setRaw | string $body | void | Sets binary body of file to upload, available if request method is POST!<br/> |
-| setProgressHandler | [Lucinda\URL\Request\Progress](https://github.com/aherne/requester/blob/v2.0/src/Request/Progress.php) $progressHandler | void | Sets handle to use in tracking upload progress. |
-| execute | bool $returnTransfer = true,<br/>int $maxRedirectionsAllowed = 0,<br/>int $timeout = 300000 | [Lucinda\URL\Response](https://github.com/aherne/requester/blob/v2.0/src/Response.php) | Uploads file, updating response status accordingly. |
+| setProgressHandler | [Lucinda\URL\Request\Progress](https://github.com/aherne/requester/blob/master/src/Request/Progress.php) $progressHandler | void | Sets handle to use in tracking upload progress. |
+| execute | bool $returnTransfer = true,<br/>int $maxRedirectionsAllowed = 0,<br/>int $timeout = 300000 | [Lucinda\URL\Response](https://github.com/aherne/requester/blob/master/src/Response.php) | Uploads file, updating response status accordingly. |
 
 Example (uploads LOCAL_FILE_PATH to REMOTE_FILE_PATH):
 
@@ -87,14 +87,14 @@ $request->execute();
 ```
 ### File Downloading
 
-API comes with [Lucinda\URL\Request](https://github.com/aherne/requester/blob/v2.0/src/Request.php) extensions specifically designed for file download. To download a file you must use [Lucinda\URL\FileDownload](https://github.com/aherne/requester/blob/v2.0/src/FileDownload.php), which comes with following additional public methods:
+API comes with [Lucinda\URL\Request](https://github.com/aherne/requester/blob/master/src/Request.php) extensions specifically designed for file download. To download a file you must use [Lucinda\URL\FileDownload](https://github.com/aherne/requester/blob/master/src/FileDownload.php), which comes with following additional public methods:
 
 | Method | Arguments | Returns | Description |
 | --- | --- | --- | --- |
-| setMethod | [Lucinda\URL\Request\Method](https://github.com/aherne/requester/blob/v2.0/src/Request/Method.php) $method | void | Specializes parent method to only allow GET requests |
+| setMethod | [Lucinda\URL\Request\Method](https://github.com/aherne/requester/blob/master/src/Request/Method.php) $method | void | Specializes parent method to only allow GET requests |
 | setFile | string $path | void | Sets absolute location where file will be downloaded (incl. file name and extension)!<br/><small>Using this method is **mandatory**!</small> |
-| setProgressHandler | [Lucinda\URL\Request\Progress](https://github.com/aherne/requester/blob/v2.0/src/Request/Progress.php) $progressHandler | void | Sets handle to use in tracking download progress. |
-| execute | bool $returnTransfer = true,<br/>int $maxRedirectionsAllowed = 0,<br/>int $timeout = 300000 | [Lucinda\URL\Response](https://github.com/aherne/requester/blob/v2.0/src/Response.php) | Downloads file, updating response status accordingly. |
+| setProgressHandler | [Lucinda\URL\Request\Progress](https://github.com/aherne/requester/blob/master/src/Request/Progress.php) $progressHandler | void | Sets handle to use in tracking download progress. |
+| execute | bool $returnTransfer = true,<br/>int $maxRedirectionsAllowed = 0,<br/>int $timeout = 300000 | [Lucinda\URL\Response](https://github.com/aherne/requester/blob/master/src/Response.php) | Downloads file, updating response status accordingly. |
 
 Example (downloads REMOTE_FILE_PATH into LOCAL_FILE_PATH):
 
@@ -116,14 +116,14 @@ $multiRequest->add(new Lucinda\URL\Request("https://www.lucinda-framework.com/tu
 $responses = $multiRequest->execute();
 ```
 
-This executes two requests simultaneously using HTTP2 pipelining and receives a Response object array. The class in charge of single requests is [Lucinda\URL\MultiRequest](https://github.com/aherne/requester/blob/v2.0/src/MultiRequest.php), defining following public methods:
+This executes two requests simultaneously using HTTP2 pipelining and receives a Response object array. The class in charge of single requests is [Lucinda\URL\MultiRequest](https://github.com/aherne/requester/blob/master/src/MultiRequest.php), defining following public methods:
 
 | Method | Arguments | Returns | Description |
 | --- | --- | --- | --- |
-| __construct | [Lucinda\URL\Request\Pipelining](https://github.com/aherne/requester/blob/v2.0/src/Request/Pipelining.php) $pipeliningOption | void | Initiates a multi URL connection based on one of enum values |
+| __construct | [Lucinda\URL\Request\Pipelining](https://github.com/aherne/requester/blob/master/src/Request/Pipelining.php) $pipeliningOption | void | Initiates a multi URL connection based on one of enum values |
 | add | Request $request | void | Adds request to execution pool. |
-| setCustomOption | int $curlMultiOpt,<br/>mixed $value | void | Sets a custom CURLMOPT_* request option not covered by API already.<br/><small>Throws [Lucinda\URL\RequestException](https://github.com/aherne/requester/blob/v2.0/src/RequestException.php) if option is already covered |
-| execute | bool $returnTransfer = true,<br/>int $maxRedirectionsAllowed = 0,<br/>int $timeout = 300000 | [Lucinda\URL\Response](https://github.com/aherne/requester/blob/v2.0/src/Response.php)[] | Validates requests in pool then executes them asynchronously in order to produce responses.<br/><small>Throws [Lucinda\URL\RequestException](https://github.com/aherne/requester/blob/v2.0/src/RequestException.php) if invalid request options combination was found.<br/>Throws [Lucinda\URL\ResponseException](https://github.com/aherne/requester/blob/v2.0/src/ResponseException.php) if response retrieval failed (eg: response exceeded timeout).</small> |
+| setCustomOption | int $curlMultiOpt,<br/>mixed $value | void | Sets a custom CURLMOPT_* request option not covered by API already.<br/><small>Throws [Lucinda\URL\RequestException](https://github.com/aherne/requester/blob/master/src/RequestException.php) if option is already covered |
+| execute | bool $returnTransfer = true,<br/>int $maxRedirectionsAllowed = 0,<br/>int $timeout = 300000 | [Lucinda\URL\Response](https://github.com/aherne/requester/blob/master/src/Response.php)[] | Validates requests in pool then executes them asynchronously in order to produce responses.<br/><small>Throws [Lucinda\URL\RequestException](https://github.com/aherne/requester/blob/master/src/RequestException.php) if invalid request options combination was found.<br/>Throws [Lucinda\URL\ResponseException](https://github.com/aherne/requester/blob/master/src/ResponseException.php) if response retrieval failed (eg: response exceeded timeout).</small> |
 
 Unlike native curl_multi, responses will be received in the order requests were pooled! Execution will be performed depending on pipelining option (see constructor):
 
@@ -146,11 +146,11 @@ $response1 = $request1->execute();
 $response2 = $request2->execute();
 ```
 
-This very poorly documented feature makes 2nd request able to see cookies in first request. The class in charge of cookie-sharing requests is [Lucinda\URL\SharedRequest](https://github.com/aherne/requester/blob/v2.0/src/SharedRequest.php), defining following public methods:
+This very poorly documented feature makes 2nd request able to see cookies in first request. The class in charge of cookie-sharing requests is [Lucinda\URL\SharedRequest](https://github.com/aherne/requester/blob/master/src/SharedRequest.php), defining following public methods:
 
 | Method | Arguments | Returns | Description |
 | --- | --- | --- | --- |
-| __construct | [Lucinda\URL\Request\ShareType](https://github.com/aherne/requester/blob/v2.0/src/Request/ShareType.php) $shareOption | void | Initiates a shared URL connection based on one of enum values |
+| __construct | [Lucinda\URL\Request\ShareType](https://github.com/aherne/requester/blob/master/src/Request/ShareType.php) $shareOption | void | Initiates a shared URL connection based on one of enum values |
 | add | Request $request | void | Adds request to share pool. |
 
 Unlike the other two classes of running requests, each request must be executed manually in order to produce a response! Cookie sharing will be performed depending on share type option (see constructor):
@@ -163,17 +163,17 @@ Unlike the other two classes of running requests, each request must be executed 
 
 API comes with a number of classes for working with cookies, whose area is IN BETWEEN requests and responses:
 
-- [Lucinda\URL\Cookies](https://github.com/aherne/requester/blob/v2.0/src/Cookies.php): implements general cookies handling operations (based on cURL standards)
-- [Lucinda\URL\Cookies\Cookie](https://github.com/aherne/requester/blob/v2.0/src/Cookies/Cookie.php): implements logic of individual cookie (based on HTTP set-cookie header standards)
-- [Lucinda\URL\Cookies\CookieParser](https://github.com/aherne/requester/blob/v2.0/src/Cookies/CookieParser.php): interface defining blueprints for encapsulating/decapsulating cookies into/from
-    - *headers*: via [Lucinda\URL\Cookies\CookieHeader](https://github.com/aherne/requester/blob/v2.0/src/Cookies/CookieHeader.php)
-    - *files*: via [Lucinda\URL\Cookies\CookieFile](https://github.com/aherne/requester/blob/v2.0/src/Cookies/CookieFile.php)
+- [Lucinda\URL\Cookies](https://github.com/aherne/requester/blob/master/src/Cookies.php): implements general cookies handling operations (based on cURL standards)
+- [Lucinda\URL\Cookies\Cookie](https://github.com/aherne/requester/blob/master/src/Cookies/Cookie.php): implements logic of individual cookie (based on HTTP set-cookie header standards)
+- [Lucinda\URL\Cookies\CookieParser](https://github.com/aherne/requester/blob/master/src/Cookies/CookieParser.php): interface defining blueprints for encapsulating/decapsulating cookies into/from
+    - *headers*: via [Lucinda\URL\Cookies\CookieHeader](https://github.com/aherne/requester/blob/master/src/Cookies/CookieHeader.php)
+    - *files*: via [Lucinda\URL\Cookies\CookieFile](https://github.com/aherne/requester/blob/master/src/Cookies/CookieFile.php)
 
 They are rarely needed in everyday usage, so for more info click on their links to see documentation. To see how they can be used, please check respective unit tests!
 
 ## Working with responses
 
-The end result of every successful request (defined as one that received ANY response) is encapsulated into a [Lucinda\URL\Response](https://github.com/aherne/requester/blob/v2.0/src/Response.php) object that includes:
+The end result of every successful request (defined as one that received ANY response) is encapsulated into a [Lucinda\URL\Response](https://github.com/aherne/requester/blob/master/src/Response.php) object that includes:
 
 - *response status*: HTTP status that came with response
 - *response headers*: HTTP headers received along with response
@@ -189,7 +189,7 @@ All this information can be queried via following public methods:
 | getURL | void | string | Gets url requested |
 | getBody | void | string | Gets response body |
 | getHeaders | void | string[string] | Gets response headers by name and value |
-| getCustomOption | int $curlinfo | mixed | Gets value of a custom CURLINFO_* response option not covered by API already.<br/><small>Throws [Lucinda\URL\ResponseException](https://github.com/aherne/requester/blob/v2.0/src/ResponseException.php) if option is already covered</small> |
+| getCustomOption | int $curlinfo | mixed | Gets value of a custom CURLINFO_* response option not covered by API already.<br/><small>Throws [Lucinda\URL\ResponseException](https://github.com/aherne/requester/blob/master/src/ResponseException.php) if option is already covered</small> |
 
 ## Examples
 
@@ -235,9 +235,9 @@ $response = $request->execute();
 
 Following exceptions may be thrown during request-response process by this API:
 
-- [Lucinda\URL\Request\Exception](https://github.com/aherne/requester/blob/v2.0/src/Request/Exception.php): if an error has occurred in processing request (request is invalid) BEFORE request being sent. Thrown on logical errors defined by this API.
-- [Lucinda\URL\Response\Exception](https://github.com/aherne/requester/blob/v2.0/src/Response/Exception.php): if an error has occurred in receiving response (eg: target host is not responding) AFTER request was sent (covering curl_*err* and curl_multi_*err* functions)
-- [Lucinda\URL\FileNotFoundException](https://github.com/aherne/requester/blob/v2.0/src/FileNotFoundException.php): if request referenced a local file that doesn't exist.
+- [Lucinda\URL\Request\Exception](https://github.com/aherne/requester/blob/master/src/Request/Exception.php): if an error has occurred in processing request (request is invalid) BEFORE request being sent. Thrown on logical errors defined by this API.
+- [Lucinda\URL\Response\Exception](https://github.com/aherne/requester/blob/master/src/Response/Exception.php): if an error has occurred in receiving response (eg: target host is not responding) AFTER request was sent (covering curl_*err* and curl_multi_*err* functions)
+- [Lucinda\URL\FileNotFoundException](https://github.com/aherne/requester/blob/master/src/FileNotFoundException.php): if request referenced a local file that doesn't exist.
 
 A few observations:
 
