@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\URL\Request;
 
 use Lucinda\URL\Request;
@@ -13,7 +14,7 @@ class SSLTest
         $response = $request->execute();
         return new Result(json_decode($response->getBody(), true)["body"]=="OK");
     }
-        
+
 
     public function setPrivateKey()
     {

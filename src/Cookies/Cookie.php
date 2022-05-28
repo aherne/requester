@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\URL\Cookies;
 
 /**
@@ -12,9 +13,9 @@ class Cookie
     private string $path = "/";
     private string $domain = "";
     private bool $includeSubdomains = false;
-    private bool $isSecuredByHTTPS = false;
-    private bool $isSecuredByHTTPheaders = false;
-    
+    private bool $isSecuredByHttps = false;
+    private bool $isSecuredByHttpHeaders = false;
+
     /**
      * Sets up cookie by name and value
      *
@@ -26,7 +27,7 @@ class Cookie
         $this->name = $name;
         $this->value = $value;
     }
-    
+
     /**
      * Gets cookie name
      *
@@ -36,7 +37,7 @@ class Cookie
     {
         return $this->name;
     }
-    
+
     /**
      * Gets cookie value
      *
@@ -46,7 +47,7 @@ class Cookie
     {
         return $this->value;
     }
-        
+
     /**
      * Sets path on the server in which the cookie will be available on.
      *
@@ -56,7 +57,7 @@ class Cookie
     {
         $this->path = $path;
     }
-    
+
     /**
      * Gets path on the server in which the cookie will be available on.
      *
@@ -66,19 +67,17 @@ class Cookie
     {
         return $this->path;
     }
-    
+
     /**
      * Sets (sub)domain that the cookie is available to.
      *
      * @param string $domain
-     * @param bool $includeSubdomains
      */
-    public function setDomain(string $domain, bool $includeSubdomains = false): void
+    public function setDomain(string $domain): void
     {
         $this->domain = $domain;
-        $this->includeSubdomains = $includeSubdomains;
     }
-    
+
     /**
      * Gets domain that the cookie is available to.
      *
@@ -88,17 +87,28 @@ class Cookie
     {
         return $this->domain;
     }
-    
+
+    /**
+     * Sets whether subdomains should be available
+     *
+     * @param bool $includeSubdomains
+     * @return void
+     */
+    public function setSubdomainsIncluded(bool $includeSubdomains): void
+    {
+        $this->includeSubdomains = $includeSubdomains;
+    }
+
     /**
      * Gets whether subdomains should be available for cookie
      *
      * @return bool
      */
-    public function getSubdomainsIncluded(): bool
+    public function isSubdomainsIncluded(): bool
     {
         return $this->includeSubdomains;
     }
-    
+
     /**
      * Sets number of seconds by which cookie expires
      *
@@ -108,7 +118,7 @@ class Cookie
     {
         $this->maxAge = $maxAge;
     }
-    
+
     /**
      * Gets number of seconds by which cookie expires
      *
@@ -118,40 +128,40 @@ class Cookie
     {
         return $this->maxAge;
     }
-    
+
     /**
-     * Sets whether cookies are available only if protocol is HTTPS
+     * Sets whether cookies are available only if protocol is Https
      */
-    public function setSecuredByHTTPS(): void
+    public function setSecuredByHttps(): void
     {
-        $this->isSecuredByHTTPS = true;
+        $this->isSecuredByHttps = true;
     }
-    
+
     /**
-     * Gets whether cookies are available only if protocol is HTTPS
+     * Gets whether cookies are available only if protocol is Https
      *
      * @return bool
      */
-    public function getSecuredByHTTPS(): bool
+    public function isSecuredByHttps(): bool
     {
-        return $this->isSecuredByHTTPS;
+        return $this->isSecuredByHttps;
     }
-    
+
     /**
      * Sets whether cookies are not available to client via JavaScript
      */
-    public function setSecuredByHTTPheaders(): void
+    public function setSecuredByHttpHeaders(): void
     {
-        $this->isSecuredByHTTPheaders = true;
+        $this->isSecuredByHttpHeaders = true;
     }
-    
+
     /**
      * Gets whether cookies are not available to client via JavaScript
      *
      * @return bool
      */
-    public function getSecuredByHTTPheaders(): bool
+    public function isSecuredByHttpHeaders(): bool
     {
-        return $this->isSecuredByHTTPheaders;
+        return $this->isSecuredByHttpHeaders;
     }
 }

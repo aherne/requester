@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\URL;
 
 use Lucinda\URL\Response\Exception as ResponseException;
@@ -14,48 +15,52 @@ class Response
         CURLINFO_RESPONSE_CODE=>"setStatusCode",
         CURLINFO_EFFECTIVE_URL=>"setURL"
     ];
-    
+
     private Connection $connection;
-    
+
     private string $url;
     private int $duration;
     private int $responseCode;
     private string $body;
+    /**
+     * @var array<string,string>
+     */
     private array $headers;
-    
+
     /**
      * Sets basic information, response body and headers
      *
      * @param Connection $connection
      * @param string $body
-     * @param array $headers
+     * @param array<string,string> $headers
      * @param float $duration
      */
     public function __construct(Connection $connection, string $body, array $headers, float $duration = 0)
     {
         $this->connection = $connection;
-        
+
         $this->setDuration($duration);
         $this->setStatusCode();
         $this->setURL();
         $this->setBody($body);
         $this->setHeaders($headers);
     }
-    
+
     /**
      * Gets obscure CURLINFO not already covered by API.
      *
      * @param int $curlinfo Curlinfo option (eg: CURLINFO_PRIVATE)
+     * @return mixed
      * @throws ResponseException If option already covered
      */
-    public function getCustomOption(int $curlinfo)
+    public function getCustomOption(int $curlinfo): mixed
     {
         if (isset(self::COVERED_OPTIONS[$curlinfo])) {
             throw new ResponseException("Option already covered by ".self::COVERED_OPTIONS[$curlinfo]." method!");
         }
-        return $this->connection->get($curlinfo);
+        return $this->connection->getOption($curlinfo);
     }
-    
+
     /**
      * Sets total response duration in milliseconds
      *
@@ -64,14 +69,14 @@ class Response
     private function setDuration(float $duration): void
     {
         if ($duration==0) {
-            $this->duration = round($duration*1000);
+            $this->duration = (int) round($duration*1000);
         } elseif (defined("CURLINFO_TOTAL_TIME_T")) {
-            $this->duration = round($this->connection->get(CURLINFO_TOTAL_TIME_T)/1000);
+            $this->duration = (int) round($this->connection->getOption(CURLINFO_TOTAL_TIME_T)/1000);
         } else {
-            $this->duration = round($this->connection->get(CURLINFO_TOTAL_TIME)*1000);
+            $this->duration = (int) round($this->connection->getOption(CURLINFO_TOTAL_TIME)*1000);
         }
     }
-    
+
     /**
      * Gets total duration in milliseconds by whom response was received
      *
@@ -81,15 +86,15 @@ class Response
     {
         return $this->duration;
     }
-    
+
     /**
      * Sets response HTTP status code
      */
     private function setStatusCode(): void
     {
-        $this->responseCode = $this->connection->get(CURLINFO_RESPONSE_CODE);
+        $this->responseCode = $this->connection->getOption(CURLINFO_RESPONSE_CODE);
     }
-    
+
     /**
      * Gets response HTTP status code
      *
@@ -99,15 +104,15 @@ class Response
     {
         return $this->responseCode;
     }
-    
+
     /**
      * Sets URL requested
      */
     private function setURL(): void
     {
-        $this->url = $this->connection->get(CURLINFO_EFFECTIVE_URL);
+        $this->url = $this->connection->getOption(CURLINFO_EFFECTIVE_URL);
     }
-    
+
     /**
      * Gets url requested
      *
@@ -117,7 +122,7 @@ class Response
     {
         return $this->url;
     }
-    
+
     /**
      * Sets response body
      *
@@ -127,7 +132,7 @@ class Response
     {
         $this->body = $body;
     }
-    
+
     /**
      * Gets response body
      *
@@ -137,21 +142,21 @@ class Response
     {
         return $this->body;
     }
-    
+
     /**
      * Sets response headers by name and value
      *
-     * @param array $headers
+     * @param array<string,string> $headers
      */
     private function setHeaders(array $headers): void
     {
         $this->headers = $headers;
     }
-    
+
     /**
      * Gets response headers by name and value
      *
-     * @return array
+     * @return array<string,string>
      */
     public function getHeaders(): array
     {

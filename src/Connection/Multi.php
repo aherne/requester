@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\URL\Connection;
 
 use Lucinda\URL\Response\Exception;
@@ -9,8 +10,12 @@ use Lucinda\URL\Response\Exception;
 class Multi
 {
     private \CurlMultiHandle $connection;
+    /**
+     * @var array<int,\CurlHandle>
+     */
     private array $children = [];
-    
+    protected bool $returnTransfer = true;
+
     /**
      * Initiates a new URL multi-connection
      */
@@ -18,7 +23,7 @@ class Multi
     {
         $this->connection = \curl_multi_init();
     }
-    
+
     /**
      * Automatically closes URL multi-connection created
      */
@@ -29,7 +34,7 @@ class Multi
         }
         \curl_multi_close($this->connection);
     }
-    
+
     /**
      * Adds a simple connection to pool
      *
@@ -41,27 +46,36 @@ class Multi
         \curl_multi_add_handle($this->connection, $connection->getDriver());
         $this->children[(int) $driver] = $driver;
     }
-    
+
     /**
      * Sets multi-connection option
      *
      * @param int $curlMultiOpt CURLMOPT_* constant
      * @param int|callable $value
      */
-    public function set(int $curlMultiOpt, int|callable $value): void
+    public function setOption(int $curlMultiOpt, int|callable $value): void
     {
         \curl_multi_setopt($this->connection, $curlMultiOpt, $value);
     }
-    
+
+    /**
+     * Sets whether transfer should be returned (default is YES)
+     *
+     * @param bool $returnTransfer
+     * @return void
+     */
+    public function setReturnTransfer(bool $returnTransfer): void
+    {
+        $this->returnTransfer = $returnTransfer;
+    }
+
     /**
      * Executes multi-connection and returns response body for each connection pooled
      *
-     * @param array $headers
-     * @param bool $returnTransfer
      * @throws Exception
-     * @return array
+     * @return array<int,string>
      */
-    public function execute(array $headers, bool $returnTransfer = true): array
+    public function execute(): array
     {
         // executes multi handle
         $active = null;
@@ -74,7 +88,7 @@ class Multi
                 curl_multi_select($this->connection);
             }
         } while ($active);
-        
+
         // get responses
         $responses = [];
         while ($info = curl_multi_info_read($this->connection)) {
@@ -82,9 +96,9 @@ class Multi
                 throw new Exception(curl_multi_strerror($info["result"]), curl_multi_errno($this->connection));
             }
             $key = (int) $info['handle'];
-            $responses[$key] = $returnTransfer?curl_multi_getcontent($this->children[$key]):"";
+            $responses[$key] = $this->returnTransfer ? curl_multi_getcontent($this->children[$key]) : "";
         }
-        
+
         return $responses;
     }
 }

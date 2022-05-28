@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\URL\Request;
 
 use Lucinda\URL\Request;
@@ -18,7 +19,7 @@ class ParametersTest
         $payload = json_decode($response->getBody(), true);
         return new Result($payload["request"] == ["a"=>"b", "c"=>"d"]);
     }
-        
+
 
     public function addFile()
     {

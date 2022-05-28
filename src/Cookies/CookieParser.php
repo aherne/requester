@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\URL\Cookies;
 
 /**
@@ -13,7 +14,7 @@ interface CookieParser
      * @return string
      */
     public function encrypt(Cookie $cookie): string;
-    
+
     /**
      * Decrypts cookie
      *

@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\URL;
 
 use Lucinda\URL\FileUpload;
@@ -11,7 +12,7 @@ class FileUploadTest
     private $destinationFilePath;
     private $progressHandler;
     private $object;
-    
+
     public function __construct()
     {
         $this->sourceFilePath = dirname(__DIR__).DIRECTORY_SEPARATOR."composer.json";
@@ -25,20 +26,20 @@ class FileUploadTest
         $this->object->setMethod(Method::PUT);
         return new Result(true, "tested via execute");
     }
-        
+
 
     public function setFile()
     {
         $this->object->setFile($this->sourceFilePath);
         return new Result(true, "tested via execute");
     }
-        
+
 
     public function setParameters()
     {
         return new Result(true, "operation not available for upload");
     }
-        
+
 
     public function setRaw()
     {
@@ -50,39 +51,39 @@ class FileUploadTest
         unlink($this->destinationFilePath);
         return new Result($json["name"] == "lucinda/requester", "tested upload");
     }
-        
+
 
     public function setCustomOption()
     {
         return new Result(true, "tested via RequestTest::setCustomOption");
     }
-        
+
 
     public function setProgressHandler()
     {
         $this->object->setProgressHandler($this->progressHandler);
         return new Result(true, "tested via execute");
     }
-        
+
 
     public function prepare()
     {
         $this->object->prepare();
         return new Result(true);
     }
-        
+
 
     public function setURL()
     {
         return new Result(true, "tested via RequestTest::setURL");
     }
-        
+
 
     public function setHeaders()
     {
         return new Result(true, "tested via RequestTest::setHeaders");
     }
-        
+
 
     public function setSSL()
     {
@@ -92,6 +93,12 @@ class FileUploadTest
     public function getDriver()
     {
         return new Result(true, "tested via RequestTest::getDriver");
+    }
+
+    public function setReturnTransfer()
+    {
+        $this->object->setReturnTransfer(true);
+        return new Result(true, "tested via execute");
     }
 
     public function execute()
@@ -104,7 +111,7 @@ class FileUploadTest
         $output[] = new Result($json["name"] == "lucinda/requester", "tested upload");
         return $output;
     }
-        
+
 
     public function getConnection()
     {

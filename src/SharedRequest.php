@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\URL;
 
 use Lucinda\URL\Connection\Shared as SharedConnection;
@@ -10,7 +11,7 @@ use Lucinda\URL\Request\ShareType;
 class SharedRequest
 {
     private SharedConnection $connection;
-    
+
     /**
      * Initiates a shared URL connection based on one of ShareType enum values
      *
@@ -19,9 +20,9 @@ class SharedRequest
     public function __construct(ShareType $type = ShareType::COOKIES)
     {
         $this->connection = new SharedConnection();
-        $this->connection->set(CURLSHOPT_SHARE, $type->value);
+        $this->connection->setOption(CURLSHOPT_SHARE, $type->value);
     }
-    
+
     /**
      * Adds request to be shared
      *

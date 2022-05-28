@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\URL\Request;
 
 use Lucinda\URL\Cookies\Cookie;
@@ -17,10 +18,12 @@ class Headers
         "referer"=>"setReferer",
         "cookie"=>"setCookie",
     ];
-
+    /**
+     * @var array<string,string>
+     */
     private array $customHeaders = [];
     private Connection $connection;
-    
+
     /**
      * Sets connection to perform operations on.
      *
@@ -30,7 +33,7 @@ class Headers
     {
         $this->connection = $connection;
     }
-    
+
     /**
      * Compiles an If-Modified-Since header based on unix time received
      *
@@ -38,10 +41,10 @@ class Headers
      */
     public function setIfModifiedSince(int $unixTime): void
     {
-        $this->connection->set(CURLOPT_TIMECONDITION, CURL_TIMECOND_IFMODSINCE);
-        $this->connection->set(CURLOPT_TIMEVALUE, $unixTime);
+        $this->connection->setOption(CURLOPT_TIMECONDITION, CURL_TIMECOND_IFMODSINCE);
+        $this->connection->setOption(CURLOPT_TIMEVALUE, $unixTime);
     }
-    
+
     /**
      * Compiles an If-Unmodified-Since header based on unix time received
      *
@@ -49,10 +52,10 @@ class Headers
      */
     public function setIfUnmodifiedSince(int $unixTime): void
     {
-        $this->connection->set(CURLOPT_TIMECONDITION, CURL_TIMECOND_IFUNMODSINCE);
-        $this->connection->set(CURLOPT_TIMEVALUE, $unixTime);
+        $this->connection->setOption(CURLOPT_TIMECONDITION, CURL_TIMECOND_IFUNMODSINCE);
+        $this->connection->setOption(CURLOPT_TIMEVALUE, $unixTime);
     }
-    
+
     /**
      * Compiles an User-Agent header based on argument received
      *
@@ -60,9 +63,9 @@ class Headers
      */
     public function setUserAgent(string $userAgent): void
     {
-        $this->connection->set(CURLOPT_USERAGENT, $userAgent);
+        $this->connection->setOption(CURLOPT_USERAGENT, $userAgent);
     }
-    
+
     /**
      * Compiles an Referer header based on argument received
      *
@@ -70,9 +73,9 @@ class Headers
      */
     public function setReferer(string $referer): void
     {
-        $this->connection->set(CURLOPT_REFERER, $referer);
+        $this->connection->setOption(CURLOPT_REFERER, $referer);
     }
-    
+
     /**
      * Compiles a Cookie header based on argument received
      *
@@ -81,9 +84,9 @@ class Headers
     public function setCookie(Cookie $cookie): void
     {
         $cookieHeader = new CookieHeader();
-        $this->connection->set(CURLOPT_COOKIE, $cookieHeader->encrypt($cookie));
+        $this->connection->setOption(CURLOPT_COOKIE, $cookieHeader->encrypt($cookie));
     }
-    
+
     /**
      * Adds a custom HTTP request header not covered already
      *
@@ -98,6 +101,6 @@ class Headers
             throw new Exception("Header already covered by ".self::COVERED_HEADERS[$lowerName]." method!");
         }
         $this->customHeaders[] = $name.": ".$value;
-        $this->connection->set(CURLOPT_HTTPHEADER, $this->customHeaders);
+        $this->connection->setOption(CURLOPT_HTTPHEADER, $this->customHeaders);
     }
 }

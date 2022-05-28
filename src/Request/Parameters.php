@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\URL\Request;
 
 use Lucinda\URL\FileNotFoundException;
@@ -9,36 +10,39 @@ use Lucinda\URL\Connection\Single as Connection;
  */
 class Parameters
 {
+    /**
+     * @var array<string,mixed>
+     */
     private array $parameters = [];
     private Connection $connection;
-    
+
     /**
      * Sets connection to perform operations on. Optionally includes key-value set of POST parameters to add already.
      *
      * @param Connection $connection
-     * @param array $parameters
+     * @param array<string,mixed> $parameters
      */
     public function __construct(Connection $connection, array $parameters = [])
     {
         $this->connection = $connection;
         if ($parameters) {
             $this->parameters = $parameters;
-            $this->connection->set(CURLOPT_POSTFIELDS, $this->parameters);
+            $this->connection->setOption(CURLOPT_POSTFIELDS, $this->parameters);
         }
     }
-    
+
     /**
      * Adds a POST parameter by key and value (to be accessible as $_POST in response)
      *
      * @param string $key
-     * @param int|string|array $value
+     * @param int|string|array<mixed> $value
      */
     public function add(string $key, int|string|array $value): void
     {
         $this->parameters[$key] = $value;
-        $this->connection->set(CURLOPT_POSTFIELDS, $this->parameters);
+        $this->connection->setOption(CURLOPT_POSTFIELDS, $this->parameters);
     }
-    
+
     /**
      * Adds a POST parameter by key and file path/name (to be accessible as $_FILES in response)
      *
@@ -53,6 +57,6 @@ class Parameters
             throw new FileNotFoundException($path);
         }
         $this->parameters[$key] = $this->connection->createFile($path, $name);
-        $this->connection->set(CURLOPT_POSTFIELDS, $this->parameters);
+        $this->connection->setOption(CURLOPT_POSTFIELDS, $this->parameters);
     }
 }

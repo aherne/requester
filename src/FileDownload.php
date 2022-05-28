@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\URL;
 
 use Lucinda\URL\Request\Exception as RequestException;
@@ -16,7 +17,7 @@ class FileDownload extends Request
         CURLOPT_NOPROGRESS=>"setProgressHandler",
         CURLOPT_PROGRESSFUNCTION=>"setProgressHandler"
     ];
-    private $fileHandle;
+    private mixed $fileHandle = null;
 
     /**
      * {@inheritDoc}
@@ -30,7 +31,7 @@ class FileDownload extends Request
         }
         $this->method = $method;
     }
-    
+
     /**
      * Sets location where file will be downloaded
      *
@@ -39,7 +40,7 @@ class FileDownload extends Request
     public function setFile(string $path): void
     {
         $this->fileHandle = fopen($path, "w+");
-        $this->connection->set(CURLOPT_FILE, $this->fileHandle);
+        $this->connection->setOption(CURLOPT_FILE, $this->fileHandle);
     }
 
     /**
@@ -51,7 +52,7 @@ class FileDownload extends Request
     {
         // method not applicable
     }
-    
+
     /**
      * {@inheritDoc}
      * @see \Lucinda\URL\Request::setCustomOption()
@@ -63,9 +64,9 @@ class FileDownload extends Request
         } elseif (isset(self::COVERED_OPTIONS[$curlopt])) {
             throw new RequestException("Option already covered by ".self::COVERED_OPTIONS[$curlopt]." method!");
         }
-        $this->connection->set($curlopt, $value);
+        $this->connection->setOption($curlopt, $value);
     }
-    
+
     /**
      * Sets handler that will be used in tracking download progress
      *
@@ -73,53 +74,63 @@ class FileDownload extends Request
      */
     public function setProgressHandler(Progress $progressHandler): void
     {
-        $this->connection->set(CURLOPT_BUFFERSIZE, $progressHandler->getBufferSize());
-        $this->connection->set(CURLOPT_NOPROGRESS, false);
-        $this->connection->set(
+        $this->connection->setOption(CURLOPT_BUFFERSIZE, $progressHandler->getBufferSize());
+        $this->connection->setOption(CURLOPT_NOPROGRESS, false);
+        $this->connection->setOption(
             CURLOPT_PROGRESSFUNCTION,
             function ($curl, int $downloadSize, int $downloaded, int $uploadSize, int $uploaded) use ($progressHandler) {
                 $progressHandler->handle($downloadSize, $downloaded);
             }
         );
     }
-    
+
     /**
      * {@inheritDoc}
      * @see \Lucinda\URL\Request::prepare()
      */
-    public function prepare(bool $returnTransfer = true, int $maxRedirectionsAllowed = 0, int $timeout = 300000): void
+    public function prepare(int $maxRedirectionsAllowed = 0, int $timeout = 300000): void
+    {
+        $this->validate();
+
+        // validate that handle was used
+        if (str_starts_with($this->url, "https") && !$this->isSSL) {
+            $this->setSSL($this->getDefaultCertificatePath());
+        }
+
+        // ignore non-applicable $returntransfer, $maxRedirectionsAllowed
+
+        // sets connection timeout
+        $this->connection->setOption(CURLOPT_CONNECTTIMEOUT_MS, $timeout);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Lucinda\URL\Request::validate()
+     */
+    protected function validate(): void
     {
         // validate url
         if (!$this->url) {
             throw new RequestException("Setting a URL is mandatory!");
         }
-        
-        // validate that handle was used
+
         if (!$this->fileHandle) {
             throw new RequestException("Download requests require usage of setFile method");
         }
-        
+
         // validate SSL and sets certificate if missing
         if (!str_starts_with($this->url, "https") && $this->isSSL) {
             throw new RequestException("URL requested doesn't require SSL!");
         }
-        if (str_starts_with($this->url, "https") && !$this->isSSL) {
-            $this->setSSL(dirname(__DIR__).DIRECTORY_SEPARATOR."certificates".DIRECTORY_SEPARATOR."cacert.pem");
-        }
-        
-        // ignore non-applicable $returntransfer, $maxRedirectionsAllowed
-        
-        // sets connection timeout
-        $this->connection->set(CURLOPT_CONNECTTIMEOUT_MS, $timeout);
     }
 
     /**
      * {@inheritDoc}
      * @see \Lucinda\URL\Request::execute()
      */
-    public function execute(bool $returnTransfer = true, int $maxRedirectionsAllowed = 0, int $timeout = 300000): Response
+    public function execute(int $maxRedirectionsAllowed = 0, int $timeout = 300000): Response
     {
-        $response = parent::execute($returnTransfer, $maxRedirectionsAllowed, $timeout);
+        $response = parent::execute($maxRedirectionsAllowed, $timeout);
         fclose($this->fileHandle);
         return $response;
     }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\URL;
 
 use Lucinda\URL\Request\Exception as RequestException;
@@ -20,8 +21,8 @@ class FileUpload extends Request
         CURLOPT_NOPROGRESS=>"setProgressHandler",
         CURLOPT_PROGRESSFUNCTION=>"setProgressHandler"
     ];
-    private $fileHandle;
-    
+    private mixed $fileHandle = null;
+
     /**
      * {@inheritDoc}
      * @see \Lucinda\URL\Request::__destruct()
@@ -42,18 +43,17 @@ class FileUpload extends Request
     {
         switch ($method) {
             case Method::POST:
-                $this->connection->set(CURLOPT_POST, true);
+                $this->connection->setOption(CURLOPT_POST, true);
                 break;
             case Method::PUT:
-                $this->connection->set(CURLOPT_PUT, true);
+                $this->connection->setOption(CURLOPT_PUT, true);
                 break;
             default:
                 throw new RequestException("Unsupported request method: ".$method->value);
-                break;
         }
         $this->method = $method;
     }
-    
+
     /**
      * Sets location of file to be uploaded using PUT
      *
@@ -66,8 +66,8 @@ class FileUpload extends Request
             throw new FileNotFoundException($path);
         }
         $this->fileHandle = fopen($path, "r");
-        $this->connection->set(CURLOPT_INFILE, $this->fileHandle);
-        $this->connection->set(CURLOPT_INFILESIZE, filesize($path));
+        $this->connection->setOption(CURLOPT_INFILE, $this->fileHandle);
+        $this->connection->setOption(CURLOPT_INFILESIZE, filesize($path));
     }
 
     /**
@@ -79,7 +79,7 @@ class FileUpload extends Request
     {
         throw new RequestException("Using POST parameters for file upload is not allowed: please use setRaw method instead!");
     }
-    
+
     /**
      * {@inheritDoc}
      * @see \Lucinda\URL\Request::setCustomOption()
@@ -91,9 +91,9 @@ class FileUpload extends Request
         } elseif (isset(self::COVERED_OPTIONS[$curlopt])) {
             throw new RequestException("Option already covered by ".self::COVERED_OPTIONS[$curlopt]." method!");
         }
-        $this->connection->set($curlopt, $value);
+        $this->connection->setOption($curlopt, $value);
     }
-    
+
     /**
      * Sets handler that will be used in tracking upload progress
      *
@@ -101,35 +101,44 @@ class FileUpload extends Request
      */
     public function setProgressHandler(Progress $progressHandler): void
     {
-        $this->connection->set(CURLOPT_BUFFERSIZE, $progressHandler->getBufferSize());
-        $this->connection->set(CURLOPT_NOPROGRESS, false);
-        $this->connection->set(
+        $this->connection->setOption(CURLOPT_BUFFERSIZE, $progressHandler->getBufferSize());
+        $this->connection->setOption(CURLOPT_NOPROGRESS, false);
+        $this->connection->setOption(
             CURLOPT_PROGRESSFUNCTION,
             function ($curl, int $downloadSize, int $downloaded, int $uploadSize, int $uploaded) use ($progressHandler) {
                 $progressHandler->handle($uploadSize, $uploaded);
             }
         );
     }
-    
+
     /**
      * {@inheritDoc}
      * @see \Lucinda\URL\Request::prepare()
      */
-    public function prepare(bool $returnTransfer = true, int $maxRedirectionsAllowed = 0, int $timeout = 300000): void
+    public function prepare(int $maxRedirectionsAllowed = 0, int $timeout = 300000): void
     {
-        parent::prepare($returnTransfer, $maxRedirectionsAllowed, $timeout);
-        
+        parent::prepare($maxRedirectionsAllowed, $timeout);
+
+        // signals that an upload is pending
+        if (!$this->isPOST) {
+            $this->connection->setOption(CURLOPT_UPLOAD, true);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Lucinda\URL\Request::validate()
+     */
+    protected function validate(): void
+    {
+        parent::validate();
+
         // validate PUT transfer
         if ($this->method == Method::PUT && !$this->fileHandle) {
             throw new RequestException("PUT requests require usage of setFile method");
         }
         if ($this->method != Method::PUT && $this->fileHandle) {
             throw new RequestException("File handle requires PUT request method");
-        }
-        
-        // signals that an upload is pending
-        if (!$this->isPOST) {
-            $this->connection->set(CURLOPT_UPLOAD, true);
         }
     }
 }

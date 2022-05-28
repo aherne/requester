@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\URL\Response;
 
 /**
@@ -12,7 +13,7 @@ interface Progress
      * @return int
      */
     public function getBufferSize(): int;
-    
+
     /**
      * Method to execute on each buffer download/upload interval
      *

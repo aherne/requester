@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\URL\Cookies;
 
 /**
@@ -13,10 +14,10 @@ class CookieFile implements CookieParser
     public function encrypt(Cookie $cookie): string
     {
         $options = [];
-        $options[] = ($cookie->getDomain()??"localhost").($cookie->getSecuredByHTTPheaders()?"#HttpOnly_":"");
-        $options[] = $cookie->getSubdomainsIncluded()?"TRUE":"FALSE";
+        $options[] = ($cookie->getDomain()??"localhost").($cookie->isSecuredByHttpHeaders() ? "#HttpOnly_" : "");
+        $options[] = $cookie->isSubdomainsIncluded() ? "TRUE" : "FALSE";
         $options[] = $cookie->getPath();
-        $options[] = $cookie->getSecuredByHTTPS()?"TRUE":"FALSE";
+        $options[] = $cookie->isSecuredByHttps() ? "TRUE" : "FALSE";
         $options[] = $cookie->getMaxAge();
         $options[] = $cookie->getName();
         $options[] = $cookie->getValue();
@@ -32,10 +33,12 @@ class CookieFile implements CookieParser
         $parts = explode("\t", $cookie);
         $cookie = new Cookie($parts[5], $parts[6]);
         if (stripos($parts[0], "#HttpOnly_")) {
-            $cookie->setDomain(str_replace("#HttpOnly_", "", $parts[0]), ($parts[1]=="TRUE"));
+            $cookie->setDomain(str_replace("#HttpOnly_", "", $parts[0]));
+            $cookie->setSubdomainsIncluded($parts[1]=="TRUE");
             $cookie->setSecuredByHTTPheaders();
         } else {
-            $cookie->setDomain($parts[0], ($parts[1]=="TRUE"));
+            $cookie->setDomain($parts[0]);
+            $cookie->setSubdomainsIncluded($parts[1]=="TRUE");
         }
         $cookie->setPath($parts[2]);
         if ($parts[3] == "TRUE") {

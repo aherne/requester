@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\URL;
 
 use Lucinda\URL\Request;
@@ -10,16 +11,16 @@ use Lucinda\URL\Cookies\CookieFile;
 class CookiesTest
 {
     private $file;
-    
+
     public function __construct()
     {
         $this->file = RECEIVER_FOLDER."/cookies.txt";
     }
-    
+
     public function startNewSession()
     {
         file_put_contents($this->file, "");
-        
+
         $request = new Request(RECEIVER_HTTP);
         $cookies = new Cookies($request->getConnection());
         $cookies->setFileToRead($this->file);
@@ -27,7 +28,7 @@ class CookiesTest
         $request->execute();
         $cookies1 = $cookies->getAll();
         $cookies->flushAll();
-        
+
         $request = new Request(RECEIVER_HTTP);
         $cookies = new Cookies($request->getConnection());
         $cookies->startNewSession(); // simulates browser restart
@@ -36,20 +37,20 @@ class CookiesTest
         $request->execute();
         $cookies2 = $cookies->getAll();
         $cookies->flushAll();
-        
+
         unlink($this->file);
-        
+
         $cookieFile = new CookieFile();
         return new Result($cookieFile->encrypt($cookies1[0]) != $cookieFile->encrypt($cookies2[0]));
     }
-    
-    
+
+
     public function setFileToRead()
     {
         return new Result(true, "tested via write");
     }
-    
-    
+
+
     public function setFileToWrite()
     {
         return new Result(true, "tested via write");
@@ -58,7 +59,7 @@ class CookiesTest
     public function write()
     {
         file_put_contents($this->file, "");
-        
+
         $request = new Request(RECEIVER_HTTP);
         $cookies = new Cookies($request->getConnection());
 
@@ -82,7 +83,7 @@ class CookiesTest
         // && strpos($response->getBody(), '"Cookie":"test=me"')
         return new Result(strpos($contents, "test\tme"));
     }
-    
+
     public function flushAll()
     {
         return new Result(true, "tested via write");
@@ -96,7 +97,7 @@ class CookiesTest
     public function deleteSession()
     {
         file_put_contents($this->file, "");
-        
+
         $request = new Request(RECEIVER_HTTP);
         $cookies = new Cookies($request->getConnection());
         $cookies->setFileToRead($this->file);
@@ -105,16 +106,16 @@ class CookiesTest
         $cookies1 = $cookies->getAll();
         $cookies->deleteSession();
         $cookies2 = $cookies->getAll();
-        
+
         unlink($this->file);
-        
+
         return new Result(empty($cookies2) && !empty($cookies1));
     }
 
     public function deleteAll()
     {
         file_put_contents($this->file, "");
-        
+
         $request = new Request(RECEIVER_HTTP);
         $cookies = new Cookies($request->getConnection());
         $cookies->write(new Cookie("test", "me"));
@@ -124,26 +125,26 @@ class CookiesTest
         $cookies1 = $cookies->getAll();
         $cookies->deleteAll();
         $cookies2 = $cookies->getAll();
-        
+
         unlink($this->file);
-        
+
         return new Result(empty($cookies2) && !empty($cookies1));
     }
 
     public function getAll()
     {
         file_put_contents($this->file, "");
-        
+
         $request = new Request(RECEIVER_HTTP);
         $cookies = new Cookies($request->getConnection());
         $cookies->setFileToRead($this->file);
         $cookies->setFileToWrite($this->file);
         $request->execute();
         $cookies1 = $cookies->getAll();
-        
+
         unlink($this->file);
-        
+
         $cookieFile = new CookieFile();
-        return new Result(!empty($cookies1) && strpos($cookieFile->encrypt($cookies1[0]), "PHPSESSID")!==false);
+        return new Result(!empty($cookies1) && str_contains($cookieFile->encrypt($cookies1[0]), "PHPSESSID"));
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\URL;
 
 use Lucinda\URL\Request;
@@ -17,7 +18,7 @@ class RequestTest
         $payload = json_decode($response->getBody(), true);
         return new Result($response->getStatusCode() == 200 && $payload["body"]=="OK");
     }
-        
+
 
     public function setMethod()
     {
@@ -28,7 +29,7 @@ class RequestTest
         $payload = json_decode($response->getBody(), true);
         return new Result($payload["server"]["REQUEST_METHOD"]=="POST");
     }
-        
+
 
     public function setParameters()
     {
@@ -52,7 +53,7 @@ class RequestTest
         $payload = json_decode($response->getBody(), true);
         return new Result($payload["request"] == http_build_query($parameters));
     }
-        
+
 
     public function setHeaders()
     {
@@ -74,7 +75,7 @@ class RequestTest
             $receivedHeaders["Content-Type"]=="application/json"
         );
     }
-        
+
 
     public function setSSL()
     {
@@ -84,7 +85,7 @@ class RequestTest
         $payload = json_decode($response->getBody(), true);
         return new Result($response->getStatusCode() == 200 && $payload["body"]=="OK");
     }
-        
+
 
     public function setCustomOption()
     {
@@ -99,7 +100,7 @@ class RequestTest
         $request = new Request(RECEIVER_HTTP);
         return new Result($request->getConnection() instanceof Connection);
     }
-        
+
 
     public function prepare()
     {
@@ -107,31 +108,37 @@ class RequestTest
         $request->prepare();
         return new Result(true);
     }
-        
+
+    public function setReturnTransfer()
+    {
+        return new Result(true, "tested via execute");
+    }
 
     public function execute()
     {
         $output = [];
-        
+
         // perform a HTTP request
         $request = new Request(RECEIVER_HTTP);
+        $request->setReturnTransfer(true);
         $response = $request->execute();
         $payload = json_decode($response->getBody(), true);
         $output[] = new Result($response->getStatusCode() == 200 && $payload["body"]=="OK", "tested HTTP");
-        
+
         // perform a HTTP request
         $request = new Request(RECEIVER_HTTP);
+        $request->setReturnTransfer(false);
         ob_start();
-        $response = $request->execute(false);
+        $response = $request->execute();
         ob_end_clean();
         $output[] = new Result($response->getStatusCode() == 200 && $response->getBody()=="1", "tested HTTP no body");
-        
+
         // perform a HTTPs request
         $request = new Request(RECEIVER_HTTPS);
         $response = $request->execute();
         $payload = json_decode($response->getBody(), true);
         $output[] = new Result($response->getStatusCode() == 200 && $payload["body"]=="OK", "tested HTTPS");
-        
+
         return $output;
     }
 }

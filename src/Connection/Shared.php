@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\URL\Connection;
 
 /**
@@ -7,7 +8,7 @@ namespace Lucinda\URL\Connection;
 class Shared
 {
     private \CurlShareHandle $connection;
-    
+
     /**
      * Initiates a shared URL connection
      */
@@ -15,7 +16,7 @@ class Shared
     {
         $this->connection = \curl_share_init();
     }
-    
+
     /**
      * Automatically closes shared multi-connection created
      */
@@ -23,7 +24,7 @@ class Shared
     {
         \curl_share_close($this->connection);
     }
-    
+
     /**
      * Adds a simple connection to pool
      *
@@ -33,14 +34,14 @@ class Shared
     {
         \curl_setopt($connection->getDriver(), CURLOPT_SHARE, $this->connection);
     }
-    
+
     /**
      * Sets cookie share option
      *
      * @param int $option CURLSHOPT_* constant
      * @param int $value
      */
-    public function set(int $option, int $value): void
+    public function setOption(int $option, int $value): void
     {
         \curl_share_setopt($this->connection, $option, $value);
     }

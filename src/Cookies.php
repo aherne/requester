@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\URL;
 
 use Lucinda\URL\Connection\Single as Connection;
@@ -11,7 +12,7 @@ use Lucinda\URL\Cookies\CookieFile;
 class Cookies
 {
     private Connection $connection;
-    
+
     /**
      * Sets connection to perform operations on.
      *
@@ -21,15 +22,15 @@ class Cookies
     {
         $this->connection = $connection;
     }
-    
+
     /**
      * Starts a new session cookie, ignoring that existing
      */
     public function startNewSession(): void
     {
-        $this->connection->set(CURLOPT_COOKIESESSION, true);
+        $this->connection->setOption(CURLOPT_COOKIESESSION, true);
     }
-    
+
     /**
      * Sets file to read cookies from
      *
@@ -41,9 +42,9 @@ class Cookies
         if (!file_exists($file)) {
             throw new FileNotFoundException($file);
         }
-        $this->connection->set(CURLOPT_COOKIEFILE, $file);
+        $this->connection->setOption(CURLOPT_COOKIEFILE, $file);
     }
-    
+
     /**
      * Sets file to write cookies to automatically after Request is destructed
      *
@@ -55,9 +56,9 @@ class Cookies
         if (!file_exists($file)) {
             throw new FileNotFoundException($file);
         }
-        $this->connection->set(CURLOPT_COOKIEJAR, $file);
+        $this->connection->setOption(CURLOPT_COOKIEJAR, $file);
     }
-    
+
     /**
      * Adds cookie held in memory, to be written to container file identified by setFileToWrite method
      *
@@ -66,9 +67,9 @@ class Cookies
     public function write(Cookie $cookie): void
     {
         $cookieFile = new CookieFile();
-        $this->connection->set(CURLOPT_COOKIELIST, $cookieFile->encrypt($cookie));
+        $this->connection->setOption(CURLOPT_COOKIELIST, $cookieFile->encrypt($cookie));
     }
-    
+
     /**
      * Gets all cookies in memory
      *
@@ -76,7 +77,7 @@ class Cookies
      */
     public function getAll(): array
     {
-        $temp = $this->connection->get(CURLINFO_COOKIELIST);
+        $temp = $this->connection->getOption(CURLINFO_COOKIELIST);
         $cookies = [];
         foreach ($temp as $cookie) {
             $cookieFile = new CookieFile();
@@ -84,36 +85,36 @@ class Cookies
         }
         return $cookies;
     }
-    
+
     /**
      * Writes all known cookies to container file identified by setFileToWrite method
      */
     public function flushAll(): void
     {
-        $this->connection->set(CURLOPT_COOKIELIST, "FLUSH");
+        $this->connection->setOption(CURLOPT_COOKIELIST, "FLUSH");
     }
-    
+
     /**
      * Reloads all cookies from container file identified by setFileToRead method
      */
     public function reloadAll(): void
     {
-        $this->connection->set(CURLOPT_COOKIELIST, "RELOAD");
+        $this->connection->setOption(CURLOPT_COOKIELIST, "RELOAD");
     }
-    
+
     /**
      * Deletes only session cookies held in memory
      */
     public function deleteSession(): void
     {
-        $this->connection->set(CURLOPT_COOKIELIST, "SESS");
+        $this->connection->setOption(CURLOPT_COOKIELIST, "SESS");
     }
-    
+
     /**
      * Deletes all cookies held in memory
      */
     public function deleteAll(): void
     {
-        $this->connection->set(CURLOPT_COOKIELIST, "ALL");
+        $this->connection->setOption(CURLOPT_COOKIELIST, "ALL");
     }
 }

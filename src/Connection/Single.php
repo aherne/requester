@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\URL\Connection;
 
 use Lucinda\URL\Response\Exception;
@@ -9,7 +10,7 @@ use Lucinda\URL\Response\Exception;
 class Single
 {
     protected \CurlHandle $connection;
-    
+
     /**
      * Initiates a new URL connection
      */
@@ -17,7 +18,7 @@ class Single
     {
         $this->connection = \curl_init();
     }
-    
+
     /**
      * Automatically closes URL connection created
      */
@@ -25,29 +26,29 @@ class Single
     {
         \curl_close($this->connection);
     }
-    
+
     /**
      * Sets connection option
      *
      * @param int $option CURLOPT_* constant
      * @param bool|int|string|callable|resource $value
      */
-    public function set(int $option, mixed $value): void
+    public function setOption(int $option, mixed $value): void
     {
         \curl_setopt($this->connection, $option, $value);
     }
-    
+
     /**
      * Gets connection option
      *
      * @param int $option CURLINFO_* constant
      * @return mixed
      */
-    public function get(int $option): mixed
+    public function getOption(int $option): mixed
     {
         return \curl_getinfo($this->connection, $option);
     }
-    
+
     /**
      * (ONLY FOR INTERNAL USAGE!) Builds a CURLFile object to be sent in POST requests based on arguments
      *
@@ -59,7 +60,7 @@ class Single
     {
         return \curl_file_create($path, \mime_content_type($path), $name);
     }
-    
+
     /**
      * Executes request and returns response body
      *
@@ -74,7 +75,7 @@ class Single
         }
         return $body;
     }
-    
+
     /**
      * (ONLY FOR INTERNAL USAGE!) Gets curl driver underneath. Necessary only for multiconnections!
      *

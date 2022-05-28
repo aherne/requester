@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\URL\Cookies;
 
 /**
@@ -22,13 +23,13 @@ class CookieHeader implements CookieParser
         if ($maxAge = $cookie->getMaxAge()) {
             $options.="Max-Age=".$maxAge."; ";
         }
-        if ($cookie->getSecuredByHTTPS()) {
+        if ($cookie->isSecuredByHttps()) {
             $options.="Secure; ";
         }
-        if ($cookie->getSecuredByHTTPheaders()) {
+        if ($cookie->isSecuredByHttpHeaders()) {
             $options.="HttpOnly; ";
         }
-        return $cookie->getName()."=".$cookie->getValue().($options?"; ".substr($options, 0, -2):"");
+        return $cookie->getName()."=".$cookie->getValue().($options ? "; ".substr($options, 0, -2) : "");
     }
 
     /**
@@ -45,21 +46,21 @@ class CookieHeader implements CookieParser
             if (preg_match("/Domain\s*=\s*([^;]+)/", $options, $matches)) {
                 $cookie->setDomain(trim($matches[1]));
             }
-            
+
             $matches = [];
             if (preg_match("/Path\s*=\s*([^;]+)/", $options, $matches)) {
                 $cookie->setPath(trim($matches[1]));
             }
-            
+
             $matches = [];
             if (preg_match("/Max-Age\s*=\s*([^;]+)/", $options, $matches)) {
                 $cookie->setMaxAge((int) trim($matches[1]));
             }
-            
+
             if (str_contains($options, "Secure")) {
                 $cookie->setSecuredByHTTPS();
             }
-            
+
             if (str_contains($options, "HttpOnly")) {
                 $cookie->setSecuredByHTTPheaders();
             }

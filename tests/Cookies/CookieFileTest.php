@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\URL\Cookies;
 
 use Lucinda\URL\Cookies\CookieFile;
@@ -10,16 +11,17 @@ class CookieFileTest
     public function encrypt()
     {
         $cookie = new Cookie("name", "value");
-        $cookie->setDomain("example.com", true);
+        $cookie->setDomain("example.com");
         $cookie->setPath("/");
         $cookie->setMaxAge(10);
         $cookie->setSecuredByHTTPheaders();
         $cookie->setSecuredByHTTPS();
-        
+        $cookie->setSubdomainsIncluded(true);
+
         $cookieFile = new CookieFile();
         return new Result($cookieFile->encrypt($cookie)=="example.com#HttpOnly_	TRUE	/	TRUE	10	name	value");
     }
-        
+
 
     public function decrypt()
     {
@@ -29,11 +31,11 @@ class CookieFileTest
             $cookie->getName()=="name" &&
             $cookie->getValue()=="value" &&
             $cookie->getDomain()=="example.com" &&
-            $cookie->getSubdomainsIncluded()==true &&
+            $cookie->isSubdomainsIncluded()==true &&
             $cookie->getPath()=="/" &&
             $cookie->getMaxAge()==10 &&
-            $cookie->getSecuredByHTTPheaders()==true &&
-            $cookie->getSecuredByHTTPS()==true
+            $cookie->isSecuredByHttpHeaders()==true &&
+            $cookie->isSecuredByHttps()==true
         );
     }
 }

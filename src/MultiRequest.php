@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\URL;
 
 use Lucinda\URL\Request\Exception as RequestException;
@@ -12,8 +13,12 @@ use Lucinda\URL\Connection\Multi;
 class MultiRequest
 {
     private Multi $connection;
+    /**
+     * @var array<int,Request>
+     */
     private array $children = [];
-    
+    protected bool $returnTransfer = true;
+
     /**
      * Initiates a multi URL connection based on piplining options:
      * - DISABLED: connections are not pipelined
@@ -26,9 +31,9 @@ class MultiRequest
     public function __construct(Pipelining $pipeliningOption = Pipelining::HTTP2)
     {
         $this->connection = new Multi();
-        $this->connection->set(CURLMOPT_PIPELINING, $pipeliningOption->value);
+        $this->connection->setOption(CURLMOPT_PIPELINING, $pipeliningOption->value);
     }
-        
+
     /**
      * Adds request to be executed asynchronously
      *
@@ -40,7 +45,7 @@ class MultiRequest
         $this->connection->add($connection);
         $this->children[(int) $connection->getDriver()] = $request;
     }
-    
+
     /**
      * Sets obscure cURLm option not already covered by API.
      *
@@ -53,50 +58,64 @@ class MultiRequest
         if ($curlMultiOpt==CURLMOPT_PIPELINING) {
             throw new RequestException("Option already covered by constructor!");
         }
-        $this->connection->set($curlMultiOpt, $value);
+        $this->connection->setOption($curlMultiOpt, $value);
     }
-    
+
+    /**
+     * Sets whether transfer should be returned (default is YES)
+     *
+     * @param bool $returnTransfer
+     * @return void
+     */
+    public function setReturnTransfer(bool $returnTransfer): void
+    {
+        $this->returnTransfer = $returnTransfer;
+    }
+
     /**
      * Validates requests then executes them asynchronously in order to produce responses
      *
-     * @param bool $returnTransfer Whether or not response body should be returned for each request
      * @param int $maxRedirectionsAllowed Maximum number of redirections allowed (if zero, it means none are) for each request
      * @param int $timeout Connection timeout in milliseconds for each request
-     * @throws ResponseException If execution failed
      * @return Response[]
      */
-    public function execute(bool $returnTransfer = true, int $maxRedirectionsAllowed = 0, int $timeout = 300000): array
+    public function execute(int $maxRedirectionsAllowed = 0, int $timeout = 300000): array
     {
+        $this->connection->setReturnTransfer($this->returnTransfer);
+
         // prepares handles for execution
         $headers =[];
         foreach ($this->children as $key=>$request) {
-            $request->prepare($returnTransfer, $maxRedirectionsAllowed, $timeout);
-            if ($returnTransfer) {
-                $request->getConnection()->set(
+            $request->setReturnTransfer($this->returnTransfer);
+            $request->prepare($maxRedirectionsAllowed, $timeout);
+            if ($this->returnTransfer) {
+                $request->getConnection()->setOption(
                     CURLOPT_HEADERFUNCTION,
                     function ($curl, $header) use (&$headers, $key) {
                         $position = strpos($header, ":");
                         if ($position !== false) {
-                            $headers[$key][ucwords(trim(substr($header, 0, $position)), "-")] = trim(substr($header, $position+1));
+                            $subKey = ucwords(trim(substr($header, 0, $position)), "-");
+                            $subValue = trim(substr($header, $position+1));
+                            $headers[$key][$subKey] = $subValue;
                         }
                         return strlen($header);
                     }
                 );
             }
         }
-                
+
         // executes multi-request and compiles responses
         $responses = [];
-        $bodies = $this->connection->execute($headers, $returnTransfer);
+        $bodies = $this->connection->execute();
         foreach ($this->children as $key=>$request) {
             $connection = $request->getConnection();
-            if ($returnTransfer) {
+            if ($this->returnTransfer) {
                 $responses[$key] = new Response($connection, $bodies[$key], $headers[$key]);
             } else {
                 $responses[$key] = new Response($connection, "", []);
             }
         }
-        
+
         return $responses;
     }
 }
