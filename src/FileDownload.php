@@ -21,8 +21,9 @@ class FileDownload extends Request
 
     /**
      * {@inheritDoc}
+     *
      * @throws RequestException
-     * @see \Lucinda\URL\Request::setMethod()
+     * @see    \Lucinda\URL\Request::setMethod()
      */
     public function setMethod(Method $method): void
     {
@@ -55,6 +56,7 @@ class FileDownload extends Request
 
     /**
      * {@inheritDoc}
+     *
      * @see \Lucinda\URL\Request::setCustomOption()
      */
     public function setCustomOption(int $curlopt, $value): void
@@ -86,6 +88,7 @@ class FileDownload extends Request
 
     /**
      * {@inheritDoc}
+     *
      * @see \Lucinda\URL\Request::prepare()
      */
     public function prepare(int $maxRedirectionsAllowed = 0, int $timeout = 300000): void
@@ -105,6 +108,7 @@ class FileDownload extends Request
 
     /**
      * {@inheritDoc}
+     *
      * @see \Lucinda\URL\Request::validate()
      */
     protected function validate(): void
@@ -126,6 +130,7 @@ class FileDownload extends Request
 
     /**
      * {@inheritDoc}
+     *
      * @see \Lucinda\URL\Request::execute()
      */
     public function execute(int $maxRedirectionsAllowed = 0, int $timeout = 300000): Response

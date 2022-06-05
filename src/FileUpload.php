@@ -25,6 +25,7 @@ class FileUpload extends Request
 
     /**
      * {@inheritDoc}
+     *
      * @see \Lucinda\URL\Request::__destruct()
      */
     public function __destruct()
@@ -36,20 +37,21 @@ class FileUpload extends Request
 
     /**
      * {@inheritDoc}
+     *
      * @throws RequestException
-     * @see \Lucinda\URL\Request::setMethod()
+     * @see    \Lucinda\URL\Request::setMethod()
      */
     public function setMethod(Method $method): void
     {
         switch ($method) {
-            case Method::POST:
-                $this->connection->setOption(CURLOPT_POST, true);
-                break;
-            case Method::PUT:
-                $this->connection->setOption(CURLOPT_PUT, true);
-                break;
-            default:
-                throw new RequestException("Unsupported request method: ".$method->value);
+        case Method::POST:
+            $this->connection->setOption(CURLOPT_POST, true);
+            break;
+        case Method::PUT:
+            $this->connection->setOption(CURLOPT_PUT, true);
+            break;
+        default:
+            throw new RequestException("Unsupported request method: ".$method->value);
         }
         $this->method = $method;
     }
@@ -57,7 +59,7 @@ class FileUpload extends Request
     /**
      * Sets location of file to be uploaded using PUT
      *
-     * @param string $path
+     * @param  string $path
      * @throws FileNotFoundException
      */
     public function setFile(string $path): void
@@ -72,8 +74,9 @@ class FileUpload extends Request
 
     /**
      * {@inheritDoc}
+     *
      * @throws RequestException
-     * @see \Lucinda\URL\Request::setParameters()
+     * @see    \Lucinda\URL\Request::setParameters()
      */
     public function setParameters(array $parameters = []): Parameters
     {
@@ -82,6 +85,7 @@ class FileUpload extends Request
 
     /**
      * {@inheritDoc}
+     *
      * @see \Lucinda\URL\Request::setCustomOption()
      */
     public function setCustomOption(int $curlopt, $value): void
@@ -113,6 +117,7 @@ class FileUpload extends Request
 
     /**
      * {@inheritDoc}
+     *
      * @see \Lucinda\URL\Request::prepare()
      */
     public function prepare(int $maxRedirectionsAllowed = 0, int $timeout = 300000): void
@@ -127,6 +132,7 @@ class FileUpload extends Request
 
     /**
      * {@inheritDoc}
+     *
      * @see \Lucinda\URL\Request::validate()
      */
     protected function validate(): void

@@ -50,7 +50,7 @@ class Multi
     /**
      * Sets multi-connection option
      *
-     * @param int $curlMultiOpt CURLMOPT_* constant
+     * @param int          $curlMultiOpt CURLMOPT_* constant
      * @param int|callable $value
      */
     public function setOption(int $curlMultiOpt, int|callable $value): void
@@ -61,7 +61,7 @@ class Multi
     /**
      * Sets whether transfer should be returned (default is YES)
      *
-     * @param bool $returnTransfer
+     * @param  bool $returnTransfer
      * @return void
      */
     public function setReturnTransfer(bool $returnTransfer): void

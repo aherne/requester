@@ -56,7 +56,7 @@ class Request
     /**
      * Initiates a new URL connection or imports existing cURL handler
      *
-     * @param ?string $url
+     * @param  ?string $url
      * @throws RequestException
      */
     public function __construct(?string $url = null)
@@ -70,7 +70,7 @@ class Request
     /**
      * Sets URL of requested resource
      *
-     * @param string $url
+     * @param  string $url
      * @throws RequestException If URL is invalid
      */
     public function setURL(string $url): void
@@ -90,18 +90,18 @@ class Request
     public function setMethod(Method $method): void
     {
         switch ($method) {
-            case Method::GET:
-                // do nothing
-                break;
-            case Method::POST:
-                $this->connection->setOption(CURLOPT_POST, true);
-                break;
-            case Method::HEAD:
-                $this->connection->setOption(CURLOPT_NOBODY, true);
-                break;
-            default:
-                $this->connection->setOption(CURLOPT_CUSTOMREQUEST, $method->value);
-                break;
+        case Method::GET:
+            // do nothing
+            break;
+        case Method::POST:
+            $this->connection->setOption(CURLOPT_POST, true);
+            break;
+        case Method::HEAD:
+            $this->connection->setOption(CURLOPT_NOBODY, true);
+            break;
+        default:
+            $this->connection->setOption(CURLOPT_CUSTOMREQUEST, $method->value);
+            break;
         }
         $this->method = $method;
     }
@@ -109,7 +109,7 @@ class Request
     /**
      * Sets parameters to send in POST requests through Parameters object returned.
      *
-     * @param array<string,mixed> $parameters Optional key-value set of POST parameters to send already.
+     * @param  array<string,mixed> $parameters Optional key-value set of POST parameters to send already.
      * @return Parameters
      */
     public function setParameters(array $parameters = []): Parameters
@@ -142,7 +142,7 @@ class Request
     /**
      * Sets SQL policy through SSL object returned.
      *
-     * @param string $certificateAuthorityBundlePath
+     * @param  string $certificateAuthorityBundlePath
      * @return SSL
      * @throws FileNotFoundException
      */
@@ -155,8 +155,8 @@ class Request
     /**
      * Sets obscure CURLOPT not already covered by API.
      *
-     * @param int $curlopt Curlopt option key (eg: CURLOPT_PRIVATE)
-     * @param mixed $value
+     * @param  int   $curlopt Curlopt option key (eg: CURLOPT_PRIVATE)
+     * @param  mixed $value
      * @throws RequestException If option already covered
      */
     public function setCustomOption(int $curlopt, mixed $value): void
@@ -170,7 +170,7 @@ class Request
     /**
      * Sets whether transfer should be returned (default is YES)
      *
-     * @param bool $returnTransfer
+     * @param  bool $returnTransfer
      * @return void
      */
     public function setReturnTransfer(bool $returnTransfer): void
@@ -201,8 +201,8 @@ class Request
     /**
      * Validates request and prepares it for being sent. Called already by "execute" method!
      *
-     * @param int $maxRedirectionsAllowed
-     * @param int $timeout
+     * @param  int $maxRedirectionsAllowed
+     * @param  int $timeout
      * @return void
      * @throws FileNotFoundException
      * @throws RequestException
@@ -260,8 +260,8 @@ class Request
     /**
      * Validates request then executes it in order to produce a response
      *
-     * @param int $maxRedirectionsAllowed Maximum number of redirections allowed (if zero, it means none are)
-     * @param int $timeout Connection timeout in milliseconds
+     * @param  int $maxRedirectionsAllowed Maximum number of redirections allowed (if zero, it means none are)
+     * @param  int $timeout                Connection timeout in milliseconds
      * @throws ResponseException|RequestException|FileNotFoundException If execution failed
      * @return Response
      */

@@ -30,10 +30,10 @@ class Response
     /**
      * Sets basic information, response body and headers
      *
-     * @param Connection $connection
-     * @param string $body
+     * @param Connection           $connection
+     * @param string               $body
      * @param array<string,string> $headers
-     * @param float $duration
+     * @param float                $duration
      */
     public function __construct(Connection $connection, string $body, array $headers, float $duration = 0)
     {
@@ -49,7 +49,7 @@ class Response
     /**
      * Gets obscure CURLINFO not already covered by API.
      *
-     * @param int $curlinfo Curlinfo option (eg: CURLINFO_PRIVATE)
+     * @param  int $curlinfo Curlinfo option (eg: CURLINFO_PRIVATE)
      * @return mixed
      * @throws ResponseException If option already covered
      */

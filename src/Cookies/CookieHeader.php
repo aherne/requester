@@ -9,6 +9,7 @@ class CookieHeader implements CookieParser
 {
     /**
      * {@inheritDoc}
+     *
      * @see \Lucinda\URL\Cookies\CookieParser::encrypt()
      */
     public function encrypt(Cookie $cookie): string
@@ -34,6 +35,7 @@ class CookieHeader implements CookieParser
 
     /**
      * {@inheritDoc}
+     *
      * @see \Lucinda\URL\Cookies\CookieParser::decrypt()
      */
     public function decrypt(string $cookie): Cookie

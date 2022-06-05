@@ -15,8 +15,8 @@ class SSL
     /**
      * Sets connection to perform operations on as well as file holding public PEM certificate.
      *
-     * @param Connection $connection
-     * @param string $certificateAuthorityBundlePath
+     * @param  Connection $connection
+     * @param  string     $certificateAuthorityBundlePath
      * @throws FileNotFoundException.
      */
     public function __construct(Connection $connection, string $certificateAuthorityBundlePath)
@@ -35,8 +35,8 @@ class SSL
     /**
      * Sets client SSL certificate by file path and optional password
      *
-     * @param string $path
-     * @param string $password
+     * @param  string $path
+     * @param  string $password
      * @throws FileNotFoundException
      */
     public function setCertificate(string $path, string $password=""): void
@@ -53,8 +53,8 @@ class SSL
     /**
      * Sets private keyfile for SSL certificate by file path and optional password
      *
-     * @param string $path
-     * @param string $password
+     * @param  string $path
+     * @param  string $password
      * @throws FileNotFoundException
      */
     public function setPrivateKey(string $path, string $password=""): void

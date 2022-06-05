@@ -90,8 +90,8 @@ class Headers
     /**
      * Adds a custom HTTP request header not covered already
      *
-     * @param string $name
-     * @param string $value
+     * @param  string $name
+     * @param  string $value
      * @throws Exception If header is already covered by one of specialized class methodss
      */
     public function addCustomHeader(string $name, string $value): void

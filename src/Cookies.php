@@ -34,7 +34,7 @@ class Cookies
     /**
      * Sets file to read cookies from
      *
-     * @param string $file
+     * @param  string $file
      * @throws FileNotFoundException
      */
     public function setFileToRead(string $file): void
@@ -48,7 +48,7 @@ class Cookies
     /**
      * Sets file to write cookies to automatically after Request is destructed
      *
-     * @param string $file
+     * @param  string $file
      * @throws FileNotFoundException
      */
     public function setFileToWrite(string $file): void

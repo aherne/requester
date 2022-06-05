@@ -91,7 +91,7 @@ class Cookie
     /**
      * Sets whether subdomains should be available
      *
-     * @param bool $includeSubdomains
+     * @param  bool $includeSubdomains
      * @return void
      */
     public function setSubdomainsIncluded(bool $includeSubdomains): void

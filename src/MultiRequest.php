@@ -49,8 +49,8 @@ class MultiRequest
     /**
      * Sets obscure cURLm option not already covered by API.
      *
-     * @param int $curlMultiOpt Curlmopt option key (eg: CURLMOPT_MAX_PIPELINE_LENGTH)
-     * @param int|callable $value
+     * @param  int          $curlMultiOpt Curlmopt option key (eg: CURLMOPT_MAX_PIPELINE_LENGTH)
+     * @param  int|callable $value
      * @throws RequestException If HTTP method is invalid
      */
     public function setCustomOption(int $curlMultiOpt, int|callable $value): void
@@ -64,7 +64,7 @@ class MultiRequest
     /**
      * Sets whether transfer should be returned (default is YES)
      *
-     * @param bool $returnTransfer
+     * @param  bool $returnTransfer
      * @return void
      */
     public function setReturnTransfer(bool $returnTransfer): void
@@ -75,8 +75,8 @@ class MultiRequest
     /**
      * Validates requests then executes them asynchronously in order to produce responses
      *
-     * @param int $maxRedirectionsAllowed Maximum number of redirections allowed (if zero, it means none are) for each request
-     * @param int $timeout Connection timeout in milliseconds for each request
+     * @param  int $maxRedirectionsAllowed Maximum number of redirections allowed (if zero, it means none are) for each request
+     * @param  int $timeout                Connection timeout in milliseconds for each request
      * @return Response[]
      */
     public function execute(int $maxRedirectionsAllowed = 0, int $timeout = 300000): array
