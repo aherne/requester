@@ -29,7 +29,7 @@ class HeadersTest
     }
         
 
-    public function setCookie()
+    public function addCookie()
     {
         return new Result(true, "tested via RequestTest::setHeaders");
     }

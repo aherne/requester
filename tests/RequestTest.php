@@ -46,7 +46,7 @@ class RequestTest
     {
         $request = new Request(RECEIVER_HTTP);
         $headers = $request->setHeaders();
-        $headers->setCookie(new Cookie("key", "value"));
+        $headers->addCookie(new Cookie("key", "value"));
         $headers->setIfModifiedSince(time()+10);
         $headers->setReferer("http://www.example.com");
         $headers->setUserAgent("Google Chrome");

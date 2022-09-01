@@ -15,9 +15,10 @@ class Headers
         "if-unmodified-since"=>"setIfUnmodifiedSince",
         "user-agent"=>"setUserAgent",
         "referer"=>"setReferer",
-        "cookie"=>"setCookie",
+        "cookie"=>"addCookie",
     ];
-    
+
+    private $cookies = [];
     private $customHeaders = [];
     
     private $connection;
@@ -79,10 +80,12 @@ class Headers
      *
      * @param Cookie $cookie
      */
-    public function setCookie(Cookie $cookie): void
+    public function addCookie(Cookie $cookie): void
     {
         $cookieHeader = new CookieHeader();
-        $this->connection->set(CURLOPT_COOKIE, $cookieHeader->encrypt($cookie));
+        $this->cookies[] = $cookieHeader->encrypt($cookie);
+
+        $this->connection->set(CURLOPT_COOKIE, implode("; ", $this->cookies));
     }
     
     /**
