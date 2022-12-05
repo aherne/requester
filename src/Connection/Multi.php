@@ -68,7 +68,7 @@ class Multi
         do {
             $status = curl_multi_exec($this->connection, $active);
             if ($status !== CURLM_OK) {
-                throw new Exception(curl_multi_strerror($this->connection), curl_multi_errno($this->connection));
+                throw new Exception(curl_multi_strerror($status), curl_multi_errno($this->connection));
             }
             if ($active) {
                 curl_multi_select($this->connection);
@@ -79,7 +79,7 @@ class Multi
         $responses = [];
         while ($info = curl_multi_info_read($this->connection)) {
             if ($info["result"]!==CURLE_OK) {
-                throw new Exception(curl_multi_strerror($this->connection), curl_multi_errno($this->connection));
+                throw new Exception(curl_multi_strerror($info["result"]), curl_multi_errno($this->connection));
             }
             $key = (int) $info['handle'];
             $responses[$key] = $returnTransfer?curl_multi_getcontent($this->children[$key]):"";
