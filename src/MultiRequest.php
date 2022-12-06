@@ -26,7 +26,9 @@ class MultiRequest
     public function __construct(int $pipeliningOption = Pipelining::HTTP2)
     {
         $this->connection = new Multi();
-        $this->connection->set(CURLMOPT_PIPELINING, $pipeliningOption);
+        if ($pipeliningOption !== Pipelining::DISABLED) {
+            $this->connection->set(CURLMOPT_PIPELINING, $pipeliningOption);
+        }
     }
         
     /**
