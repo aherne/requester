@@ -24,6 +24,9 @@ class Multi
      */
     public function __destruct()
     {
+        if (!$this->connection) {
+            return; // connection already closed
+        }
         foreach ($this->children as $child) {
             \curl_multi_remove_handle($this->connection, $child);
         }
