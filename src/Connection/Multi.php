@@ -28,7 +28,9 @@ class Multi
             return; // connection already closed
         }
         foreach ($this->children as $child) {
+            \set_error_handler(function($errno, $errstr) { });
             \curl_multi_remove_handle($this->connection, $child);
+            \restore_error_handler();
         }
         \curl_multi_close($this->connection);
     }
@@ -71,7 +73,6 @@ class Multi
         do {
             $status = curl_multi_exec($this->connection, $active);
             if ($status !== CURLM_OK) {
-                echo __LINE__."#".$status."\n";
                 throw new Exception(curl_multi_strerror($status), curl_multi_errno($this->connection));
             }
             if ($active) {
@@ -83,7 +84,6 @@ class Multi
         $responses = [];
         while ($info = curl_multi_info_read($this->connection)) {
             if ($info["result"]!==CURLE_OK) {
-                echo __LINE__."#".$info["result"]."\n";
                 throw new Exception(curl_multi_strerror($info["result"]), curl_multi_errno($this->connection));
             }
             $key = (int) $info['handle'];
