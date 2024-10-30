@@ -130,7 +130,7 @@ class Request
     }
 
     /**
-     * Sets credentials for proxy
+     * Sets proxy information
      *
      * @return Proxy
      */

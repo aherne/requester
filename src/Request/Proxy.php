@@ -4,6 +4,9 @@ namespace Lucinda\URL\Request;
 
 use Lucinda\URL\Connection\Single as Connection;
 
+/**
+ * Encapsulates proxy ips and credentials
+ */
 class Proxy
 {
     private $connection;
