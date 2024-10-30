@@ -4,6 +4,7 @@ namespace Lucinda\URL;
 
 use Lucinda\URL\Connection\Single as Connection;
 use Lucinda\URL\Request\Exception as RequestException;
+use Lucinda\URL\Request\Proxy;
 use Lucinda\URL\Response\Exception as ResponseException;
 use Lucinda\URL\Request\Headers;
 use Lucinda\URL\Request\SSL;
@@ -33,6 +34,8 @@ class Request
         CURLOPT_COOKIE=>"setHeaders",
         CURLOPT_HTTPHEADER=>"setHeaders",
         CURLOPT_POSTFIELDS=>"setParameters",
+        CURLOPT_PROXY=>"setProxy",
+        CURLOPT_PROXYUSERPWD=>"setProxy",
         CURLOPT_CAINFO=>"setSSL",
         CURLOPT_SSL_VERIFYPEER=>"setSSL",
         CURLOPT_SSL_VERIFYHOST=>"setSSL",
@@ -116,6 +119,16 @@ class Request
     {
         $this->isPOST = true;
         return new Parameters($this->connection, $parameters);
+    }
+
+    /**
+     * Sets proxy information
+     *
+     * @return Proxy
+     */
+    public function setProxy(): Proxy
+    {
+        return new Proxy($this->connection);
     }
 
     /**

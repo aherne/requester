@@ -42,6 +42,11 @@ class RequestTest
         return new Result($payload["request"] == $parameters);
     }
 
+    public function setProxy()
+    {
+        return new Result(true, "proxies cannot be unit tested");
+    }
+
 
     public function setRaw()
     {
