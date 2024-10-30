@@ -62,6 +62,11 @@ class RequestTest
             $receivedHeaders["Content-Type"]=="application/json"
         );
     }
+
+    public function setProxy()
+    {
+        return new Result(true, "proxies cannot be unit tested");
+    }
         
 
     public function setSSL()
