@@ -24,7 +24,7 @@ class Single
      */
     public function __destruct()
     {
-        \curl_close($this->connection);
+        $this->connection = null;;
     }
 
     /**
