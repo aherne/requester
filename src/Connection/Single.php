@@ -9,7 +9,7 @@ use Lucinda\URL\Response\Exception;
  */
 class Single
 {
-    protected \CurlHandle $connection;
+    protected ?\CurlHandle $connection = null;
 
     /**
      * Initiates a new URL connection
